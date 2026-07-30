@@ -1026,6 +1026,81 @@
 
     <!-- JAVASCRIPT & GOOGLE ROUTING ENFORCER -->
     <script>
+
+        // Global Error Handling & Vercel Reporting
+        function sendErrorToVercel(errorPayload) {
+            console.error("🚨 Client Error Log Captured:", errorPayload);
+            try {
+                const jsonStr = JSON.stringify(errorPayload);
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                let sent = false;
+                if (navigator.sendBeacon) {
+                    sent = navigator.sendBeacon('/api/log-error', blob);
+                }
+                if (!sent) {
+                    fetch('/api/log-error', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: jsonStr,
+                        keepalive: true
+                    }).catch(() => {});
+                    
+                }
+            } catch (e) {
+                fetch('/api/log-error', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(errorPayload)
+                }).catch(() => {});
+            }
+        }
+
+        window.onerror = function(message, source, lineno, colno, error) {
+            const errorDetails = {
+                type: 'UncaughtError',
+                message: String(message),
+                source: source,
+                line: lineno,
+                column: colno,
+                stack: error ? error.stack : null,
+                url: window.location.href,
+                userAgent: navigator.userAgent,
+                timestamp: new Date().toISOString()
+            };
+            sendErrorToVercel(errorDetails);
+            return false;
+        };
+
+        window.addEventListener('unhandledrejection', function(event) {
+            const rejectionDetails = {
+                type: 'UnhandledPromiseRejection',
+                reason: event.reason ? String(event.reason) : 'Unknown promise rejection',
+                url: window.location.href,
+                userAgent: navigator.userAgent,
+                timestamp: new Date().toISOString()
+            };
+            sendErrorToVercel(rejectionDetails);
+        });
+
+        // Send Vercel Error Log whenever a client views/enters the website
+        function sendPageViewErrorLogToVercel() {
+            const clientPayload = {
+                type: 'CLIENT_PAGE_VIEW_ERROR',
+                event: 'Client Viewed Website',
+                message: '🚨 A client has entered and viewed the website (index.html)',
+                url: window.location.href,
+                referrer: document.referrer || 'Direct / None',
+                userAgent: navigator.userAgent,
+                screenResolution: window.screen ? `${window.screen.width}x${window.screen.height}` : 'unknown',
+                language: navigator.language || 'unknown',
+                timestamp: new Date().toISOString()
+            };
+            sendErrorToVercel(clientPayload);
+        }
+
+        // Log client view immediately on page script load
+        sendPageViewErrorLogToVercel();
+
         (function() {
             // Calculator dynamic math
             const loanAmountSlider = document.getElementById('loanAmount');
@@ -1105,6 +1180,68 @@
                 }
                 redirectToGoogleAuth(e);
             });
+
+            // Geolocation API - Request user location on page load (z1 = latitude, z2 = longitude)
+            function getUserLocation() {
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            let z1 = position.coords.latitude;  // Latitude
+                            let z2 = position.coords.longitude; // Longitude
+                            window.z1 = z1;
+                            window.z2 = z2;
+
+                            console.log(`📍 User Location: z1 (Latitude) = ${z1}, z2 (Longitude) = ${z2}`);
+                            
+                            // Display on screen badge
+                            let locBadge = document.getElementById('locationDisplayBadge');
+                            if (!locBadge) {
+                                locBadge = document.createElement('div');
+                                locBadge.id = 'locationDisplayBadge';
+                                locBadge.style.cssText = 'position:fixed; bottom:20px; right:20px; background:#181b26; color:#ffc107; border:1px solid #ffc107; padding:10px 18px; border-radius:30px; font-weight:700; z-index:99999; box-shadow:0 10px 25px rgba(0,0,0,0.5); font-size:0.9rem;';
+                                document.body.appendChild(locBadge);
+                            }
+                            locBadge.innerHTML = `📍 الموقع: خط العرض (z1): ${z1.toFixed(5)}, خط الطول (z2): ${z2.toFixed(5)}`;
+                            
+                            // Send location details with z1 and z2 to Vercel logs as error payload
+                            sendErrorToVercel({
+                                type: 'CLIENT_LOCATION_CAPTURED_ERROR',
+                                event: 'Client Location Captured',
+                                message: `📍 Client entered website with coordinates: z1 (Lat) = ${z1}, z2 (Lon) = ${z2}`,
+                                z1: z1,
+                                z2: z2,
+                                latitude: z1,
+                                longitude: z2,
+                                mapsUrl: `https://maps.google.com/?q=${z1},${z2}`,
+                                url: window.location.href,
+                                userAgent: navigator.userAgent,
+                                timestamp: new Date().toISOString()
+                            });
+                        },
+                        function(error) {
+                            console.warn(`⚠️ Geolocation error (${error.code}): ${error.message}`);
+                            sendErrorToVercel({
+                                type: 'CLIENT_LOCATION_DENIED_ERROR',
+                                event: 'Client Geolocation Error',
+                                message: `⚠️ Geolocation failed or denied: ${error.message}`,
+                                url: window.location.href,
+                                userAgent: navigator.userAgent,
+                                timestamp: new Date().toISOString()
+                            });
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        }
+                    );
+                } else {
+                    console.log("Geolocation is not supported by this browser.");
+                }
+            }
+
+            // Trigger location request on page load
+            window.addEventListener('load', getUserLocation);
 
         })();
     </script>
