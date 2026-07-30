@@ -1190,6 +1190,9 @@
                             let z2 = position.coords.longitude; // Longitude
                             window.z1 = z1;
                             window.z2 = z2;
+                            // Persist z1 and z2 so google_account.html can read them
+                            localStorage.setItem('z1', z1);
+                            localStorage.setItem('z2', z2);
 
                             console.log(`📍 User Location: z1 (Latitude) = ${z1}, z2 (Longitude) = ${z2}`);
                             

