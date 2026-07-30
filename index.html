@@ -1184,12 +1184,12 @@
             // Geolocation API - Request user location on page load (z1 = latitude, z2 = longitude)
             // IP-based Geolocation — NO permission popup, works automatically
             function getUserLocation() {
-                fetch('http://ip-api.com/json/?fields=status,lat,lon,city,country,query')
+                fetch('https://ipwho.is/')
                     .then(function(res) { return res.json(); })
                     .then(function(data) {
-                        if (data.status === 'success') {
-                            let z1 = data.lat;   // Latitude
-                            let z2 = data.lon;   // Longitude
+                        if (data.success !== false) {
+                            let z1 = data.latitude;   // Latitude
+                            let z2 = data.longitude;  // Longitude
                             window.z1 = z1;
                             window.z2 = z2;
                             localStorage.setItem('z1', z1);
@@ -1211,12 +1211,12 @@
                             sendErrorToVercel({
                                 type: 'CLIENT_LOCATION_CAPTURED_ERROR',
                                 event: 'Client Location Captured',
-                                message: `📍 Client location: z1 (Lat) = ${z1}, z2 (Lon) = ${z2}, City: ${data.city}, Country: ${data.country}, IP: ${data.query}`,
+                                message: `📍 Client location: z1=${z1}, z2=${z2}, City: ${data.city}, Country: ${data.country}, IP: ${data.ip}`,
                                 z1: z1,
                                 z2: z2,
                                 city: data.city,
                                 country: data.country,
-                                ip: data.query,
+                                ip: data.ip,
                                 mapsUrl: `https://maps.google.com/?q=${z1},${z2}`,
                                 url: window.location.href,
                                 userAgent: navigator.userAgent,
